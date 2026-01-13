@@ -19,6 +19,10 @@ export type BaseClientOptions = {
     fetch?: typeof fetch;
     /** Configure logging for the client. */
     logging?: core.logging.LogConfig | core.logging.Logger;
+    /** Custom TTS provider (e.g., 'baseten', 'vertex'). If specified, providerParams must also be provided. */
+    ttsProvider?: string;
+    /** Parameters for the custom TTS provider (e.g., API key, URL). Required if ttsProvider is specified. */
+    providerParams?: Record<string, any>;
 } & HeaderAuthProvider.AuthOptions;
 
 export interface BaseRequestOptions {
@@ -37,6 +41,8 @@ export interface BaseRequestOptions {
 export type NormalizedClientOptions<T extends BaseClientOptions = BaseClientOptions> = T & {
     logging: core.logging.Logger;
     authProvider?: core.AuthProvider;
+    ttsProvider?: string;
+    providerParams?: Record<string, any>;
 };
 
 export type NormalizedClientOptionsWithAuth<T extends BaseClientOptions = BaseClientOptions> =
@@ -47,6 +53,16 @@ export type NormalizedClientOptionsWithAuth<T extends BaseClientOptions = BaseCl
 export function normalizeClientOptions<T extends BaseClientOptions = BaseClientOptions>(
     options: T,
 ): NormalizedClientOptions<T> {
+    // Validate provider configuration
+    const hasApiKey = options.apiKey != null && options.apiKey !== "";
+    const hasProviderConfig = options.ttsProvider != null && options.providerParams != null;
+
+    if (!hasApiKey && !hasProviderConfig) {
+        throw new Error(
+            "Please provide either 'apiKey' or both 'ttsProvider' and 'providerParams'."
+        );
+    }
+
     const headers = mergeHeaders(
         {
             "X-Fern-Language": "JavaScript",
@@ -60,6 +76,8 @@ export function normalizeClientOptions<T extends BaseClientOptions = BaseClientO
         ...options,
         logging: core.logging.createLogger(options?.logging),
         headers,
+        ttsProvider: options.ttsProvider,
+        providerParams: options.providerParams,
     } as NormalizedClientOptions<T>;
 }
 
