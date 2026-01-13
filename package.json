@@ -1,0 +1,49 @@
+{
+  "name": "@camb-ai/sdk",
+  "version": "1.0.0",
+  "description": "Official Node.js SDK for Camb.ai - Advanced voice and audio generation APIs",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "clean": "rm -rf dist",
+    "rebuild": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "camb",
+    "camb.ai",
+    "text-to-speech",
+    "tts",
+    "voice-cloning",
+    "dubbing",
+    "audio-generation",
+    "ai",
+    "speech-synthesis"
+  ],
+  "author": "Camb.ai",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Camb-ai/cambai-node-sdk.git",
+    "directory": "."
+  },
+  "bugs": {
+    "url": "https://github.com/Camb-ai/cambai-node-sdk/issues"
+  },
+  "homepage": "https://docs.camb.ai",
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

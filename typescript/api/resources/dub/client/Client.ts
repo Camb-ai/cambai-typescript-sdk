@@ -12,7 +12,7 @@ import * as CambApi from "../../../index.js";
 export declare namespace DubClient {
     export type Options = BaseClientOptions;
 
-    export interface RequestOptions extends BaseRequestOptions {}
+    export interface RequestOptions extends BaseRequestOptions { }
 }
 
 export class DubClient {
@@ -60,8 +60,8 @@ export class DubClient {
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.CambApiEnvironment.Default,
+                (await core.Supplier.get(this._options.environment)) ??
+                environments.CambApiEnvironment.Default,
                 "dub",
             ),
             method: "POST",
@@ -139,8 +139,8 @@ export class DubClient {
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.CambApiEnvironment.Default,
+                (await core.Supplier.get(this._options.environment)) ??
+                environments.CambApiEnvironment.Default,
                 `dub/${core.url.encodePathParam(taskId)}`,
             ),
             method: "GET",
@@ -210,8 +210,8 @@ export class DubClient {
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.CambApiEnvironment.Default,
+                (await core.Supplier.get(this._options.environment)) ??
+                environments.CambApiEnvironment.Default,
                 `dub-result/${core.url.encodePathParam(runId)}`,
             ),
             method: "GET",
@@ -265,14 +265,14 @@ export class DubClient {
     public getDubbingRunsResults(
         request: CambApi.GetDubbingRunsResultsDubbingResultsPostRequest,
         requestOptions?: DubClient.RequestOptions,
-    ): core.HttpResponsePromise<Record<string, CambApi.GetDubbingRunsResultsDubbingResultsPostResponseValue>> {
+    ): core.HttpResponsePromise<Record<string, unknown>> {
         return core.HttpResponsePromise.fromPromise(this.__getDubbingRunsResults(request, requestOptions));
     }
 
     private async __getDubbingRunsResults(
         request: CambApi.GetDubbingRunsResultsDubbingResultsPostRequest,
         requestOptions?: DubClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Record<string, CambApi.GetDubbingRunsResultsDubbingResultsPostResponseValue>>> {
+    ): Promise<core.WithRawResponse<Record<string, unknown>>> {
         const { run_id: runId, traceparent, body: _body } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (runId !== undefined) {
@@ -289,8 +289,8 @@ export class DubClient {
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.CambApiEnvironment.Default,
+                (await core.Supplier.get(this._options.environment)) ??
+                environments.CambApiEnvironment.Default,
                 "dubbing-results",
             ),
             method: "POST",
@@ -307,7 +307,7 @@ export class DubClient {
         });
         if (_response.ok) {
             return {
-                data: _response.body as Record<string, CambApi.GetDubbingRunsResultsDubbingResultsPostResponseValue>,
+                data: _response.body as Record<string, unknown>,
                 rawResponse: _response.rawResponse,
             };
         }
@@ -373,8 +373,8 @@ export class DubClient {
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.CambApiEnvironment.Default,
+                (await core.Supplier.get(this._options.environment)) ??
+                environments.CambApiEnvironment.Default,
                 `transcript/${core.url.encodePathParam(runId)}/${core.url.encodePathParam(language)}`,
             ),
             method: "GET",
@@ -448,8 +448,8 @@ export class DubClient {
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.CambApiEnvironment.Default,
+                (await core.Supplier.get(this._options.environment)) ??
+                environments.CambApiEnvironment.Default,
                 `dub-alt-format/${core.url.encodePathParam(runId)}/${core.url.encodePathParam(language)}`,
             ),
             method: "POST",
@@ -532,8 +532,8 @@ export class DubClient {
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.CambApiEnvironment.Default,
+                (await core.Supplier.get(this._options.environment)) ??
+                environments.CambApiEnvironment.Default,
                 `dub-alt-format/${core.url.encodePathParam(taskId)}`,
             ),
             method: "GET",
@@ -605,8 +605,8 @@ export class DubClient {
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.CambApiEnvironment.Default,
+                (await core.Supplier.get(this._options.environment)) ??
+                environments.CambApiEnvironment.Default,
                 `discord/dub/${core.url.encodePathParam(taskId)}`,
             ),
             method: "GET",
@@ -678,8 +678,8 @@ export class DubClient {
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.CambApiEnvironment.Default,
+                (await core.Supplier.get(this._options.environment)) ??
+                environments.CambApiEnvironment.Default,
                 `twitter/dub/${core.url.encodePathParam(taskId)}`,
             ),
             method: "GET",

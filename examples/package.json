@@ -1,0 +1,10 @@
+{
+    "type": "module",
+    "name": "camb-sdk-examples",
+    "version": "1.0.0",
+    "description": "Examples for Camb.ai Node.js SDK",
+    "private": true,
+    "dependencies": {
+        "@camb-ai/sdk": "file:.."
+    }
+}
