@@ -1,8 +1,8 @@
-import { CambApiClient, saveStreamToFile } from '@camb-ai/sdk';
+import { CambClient, saveStreamToFile } from '@camb-ai/sdk';
 import * as fs from 'fs';
 
 // Initialize client with Baseten provider
-const client = new CambApiClient({
+const client = new CambClient({
     ttsProvider: 'baseten',
     providerParams: {
         api_key: process.env.BASETEN_API_KEY || 'YOUR_BASETEN_API_KEY',

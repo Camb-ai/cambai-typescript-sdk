@@ -32,10 +32,10 @@ yarn add @camb-ai/sdk
 To use the Camb AI SDK, you'll need an API key. You can authenticate it by:
 
 ```javascript
-import { CambApiClient } from '@camb-ai/sdk';
+import { CambClient } from '@camb-ai/sdk';
 
 // Initialize the client
-const client = new CambApiClient({ apiKey: 'YOUR_CAMB_API_KEY' });
+const client = new CambClient({ apiKey: 'YOUR_CAMB_API_KEY' });
 ```
 
 ### Client with Specific MARS Pro Provider (e.g. Vertex, Baseten)
@@ -45,10 +45,10 @@ const client = new CambApiClient({ apiKey: 'YOUR_CAMB_API_KEY' });
 To deploy the model go to models from baseten example: https://www.baseten.co/library/mars6/ and deploy then perform setup like below
 
 ```javascript
-import { CambApiClient } from '@camb-ai/sdk';
+import { CambClient } from '@camb-ai/sdk';
 import * as fs from 'fs';
 
-const client = new CambApiClient({
+const client = new CambClient({
   ttsProvider: 'baseten',
   providerParams: {
     apiKey: 'YOUR_BASETEN_API_KEY',
@@ -75,7 +75,7 @@ const response = await client.textToSpeech.tts({
 #### Vertex Support (In Progress)
 
 ```javascript
-const client = new CambApiClient({
+const client = new CambClient({
   ttsProvider: 'vertex',
   providerParams: {
     projectId: 'my-project',
@@ -106,7 +106,7 @@ Convert text into spoken audio using one of Camb AI's high-quality voices.
 import { CambApiClient, saveStreamToFile } from '@camb-ai/sdk';
 
 // Initialize client (ensure API key is set)
-const client = new CambApiClient({ apiKey: 'YOUR_CAMB_API_KEY' });
+const client = new CambClient({ apiKey: 'YOUR_CAMB_API_KEY' });
 
 const response = await client.textToSpeech.tts({
   text: 'Hello from Camb AI! This is a test of our Text-to-Speech API.',
@@ -158,9 +158,9 @@ for (const voice of voices.slice(0, 5)) {  // Print first 5 as an example
 Create completely new and unique voices from a textual description of the desired voice characteristics.
 
 ```javascript
-import { CambApiClient } from '@camb-ai/sdk';
+import { CambClient } from '@camb-ai/sdk';
 
-const client = new CambApiClient({ apiKey: 'YOUR_CAMB_API_KEY' });
+const client = new CambClient({ apiKey: 'YOUR_CAMB_API_KEY' });
 
 try {
   console.log('Generating a new voice and speech...');
@@ -182,7 +182,7 @@ Generate sound effects or ambient audio from a descriptive prompt.
 ```javascript
 import { CambApiClient, saveStreamToFile } from '@camb-ai/sdk';
 
-const client = new CambApiClient({ apiKey: 'YOUR_CAMB_API_KEY' });
+const client = new CambClient({ apiKey: 'YOUR_CAMB_API_KEY' });
 
 const response = await client.textToAudio.createTextToAudio({
   prompt: 'A gentle breeze rustling through autumn leaves in a quiet forest.',
@@ -213,9 +213,9 @@ if (taskId) {
 Dub videos into different languages with voice cloning and translation capabilities.
 
 ```javascript
-import { CambApiClient } from '@camb-ai/sdk';
+import { CambClient } from '@camb-ai/sdk';
 
-const client = new CambApiClient({ apiKey: 'YOUR_CAMB_API_KEY' });
+const client = new CambClient({ apiKey: 'YOUR_CAMB_API_KEY' });
 
 const response = await client.dub.createDub({
   videoUrl: 'your_accessible_video_url',

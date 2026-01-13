@@ -1,6 +1,6 @@
-import { CambApiClient } from '@camb-ai/sdk';
+import { CambClient } from '@camb-ai/sdk';
 
-const client = new CambApiClient({
+const client = new CambClient({
     apiKey: process.env.CAMB_API_KEY
 });
 

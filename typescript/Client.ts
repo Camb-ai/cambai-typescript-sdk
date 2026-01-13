@@ -25,14 +25,14 @@ import * as environments from "./environments.js";
 import { handleNonStatusCodeError } from "./errors/handleNonStatusCodeError.js";
 import * as errors from "./errors/index.js";
 
-export declare namespace CambApiClient {
+export declare namespace CambClient {
     export type Options = BaseClientOptions;
 
-    export interface RequestOptions extends BaseRequestOptions {}
+    export interface RequestOptions extends BaseRequestOptions { }
 }
 
-export class CambApiClient {
-    protected readonly _options: NormalizedClientOptionsWithAuth<CambApiClient.Options>;
+export class CambClient {
+    protected readonly _options: NormalizedClientOptionsWithAuth<CambClient.Options>;
     protected _audioSeparation: AudioSeparationClient | undefined;
     protected _dub: DubClient | undefined;
     protected _folders: FoldersClient | undefined;
@@ -51,7 +51,7 @@ export class CambApiClient {
     protected _projectSetup: ProjectSetupClient | undefined;
     protected _deprecatedStreaming: DeprecatedStreamingClient | undefined;
 
-    constructor(options: CambApiClient.Options) {
+    constructor(options: CambClient.Options) {
         this._options = normalizeClientOptionsWithAuth(options);
     }
 
@@ -123,18 +123,12 @@ export class CambApiClient {
         return (this._deprecatedStreaming ??= new DeprecatedStreamingClient(this._options));
     }
 
-    /**
-     * @param {CambApiClient.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.getSwaggerDocsDocsGet()
-     */
-    public getSwaggerDocsDocsGet(requestOptions?: CambApiClient.RequestOptions): core.HttpResponsePromise<unknown> {
+    public getSwaggerDocsDocsGet(requestOptions?: CambClient.RequestOptions): core.HttpResponsePromise<unknown> {
         return core.HttpResponsePromise.fromPromise(this.__getSwaggerDocsDocsGet(requestOptions));
     }
 
     private async __getSwaggerDocsDocsGet(
-        requestOptions?: CambApiClient.RequestOptions,
+        requestOptions?: CambClient.RequestOptions,
     ): Promise<core.WithRawResponse<unknown>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
@@ -145,8 +139,8 @@ export class CambApiClient {
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.CambApiEnvironment.Default,
+                (await core.Supplier.get(this._options.environment)) ??
+                environments.CambApiEnvironment.Default,
                 "docs",
             ),
             method: "GET",
@@ -174,17 +168,17 @@ export class CambApiClient {
     }
 
     /**
-     * @param {CambApiClient.RequestOptions} requestOptions - Request-specific configuration.
+     * @param {CambClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
      *     await client.getRedocDocsRedocsGet()
      */
-    public getRedocDocsRedocsGet(requestOptions?: CambApiClient.RequestOptions): core.HttpResponsePromise<unknown> {
+    public getRedocDocsRedocsGet(requestOptions?: CambClient.RequestOptions): core.HttpResponsePromise<unknown> {
         return core.HttpResponsePromise.fromPromise(this.__getRedocDocsRedocsGet(requestOptions));
     }
 
     private async __getRedocDocsRedocsGet(
-        requestOptions?: CambApiClient.RequestOptions,
+        requestOptions?: CambClient.RequestOptions,
     ): Promise<core.WithRawResponse<unknown>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
@@ -195,8 +189,8 @@ export class CambApiClient {
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.CambApiEnvironment.Default,
+                (await core.Supplier.get(this._options.environment)) ??
+                environments.CambApiEnvironment.Default,
                 "redocs",
             ),
             method: "GET",
@@ -224,20 +218,21 @@ export class CambApiClient {
     }
 
     /**
-     * @param {CambApiClient.RequestOptions} requestOptions - Request-specific configuration.
+     * @param {CambClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
      *     await client.getOpenapiSchemaOpenapiJsonGet()
      */
     public getOpenapiSchemaOpenapiJsonGet(
-        requestOptions?: CambApiClient.RequestOptions,
+        requestOptions?: CambClient.RequestOptions,
     ): core.HttpResponsePromise<unknown> {
         return core.HttpResponsePromise.fromPromise(this.__getOpenapiSchemaOpenapiJsonGet(requestOptions));
     }
 
     private async __getOpenapiSchemaOpenapiJsonGet(
-        requestOptions?: CambApiClient.RequestOptions,
+        requestOptions?: CambClient.RequestOptions,
     ): Promise<core.WithRawResponse<unknown>> {
+
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -247,8 +242,8 @@ export class CambApiClient {
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.CambApiEnvironment.Default,
+                (await core.Supplier.get(this._options.environment)) ??
+                environments.CambApiEnvironment.Default,
                 "openapi.json",
             ),
             method: "GET",

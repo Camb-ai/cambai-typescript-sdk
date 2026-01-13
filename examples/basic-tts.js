@@ -1,7 +1,7 @@
-import { CambApiClient, saveStreamToFile } from '@camb-ai/sdk';
+import { CambClient, saveStreamToFile } from '@camb-ai/sdk';
 
 // Initialize the client with your API key
-const client = new CambApiClient({
+const client = new CambClient({
     apiKey: process.env.CAMB_API_KEY
 });
 
