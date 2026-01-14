@@ -1,9 +1,9 @@
-# Camb.ai Node.js SDK
+# Camb.ai TypeScript SDK
 
 [![npm version](https://img.shields.io/npm/v/@camb-ai/sdk.svg?style=flat-square)](https://www.npmjs.com/package/@camb-ai/sdk)
 [![License](https://img.shields.io/npm/l/@camb-ai/sdk.svg?style=flat-square)](https://github.com/Camb-ai/cambai-node-sdk/blob/main/LICENSE)
 
-The official Node.js SDK for interacting with Camb AI's powerful voice and audio generation APIs. Create expressive speech, unique voices, and rich soundscapes with just a few lines of JavaScript or TypeScript.
+The official TypeScript SDK for interacting with Camb AI's powerful voice and audio generation APIs. Create expressive speech, unique voices, and rich soundscapes with just a few lines of code. Works seamlessly in Node.js environments (18+).
 
 ## ✨ Features
 

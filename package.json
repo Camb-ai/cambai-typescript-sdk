@@ -1,7 +1,7 @@
 {
   "name": "@camb-ai/sdk",
   "version": "1.0.0",
-  "description": "Official Node.js SDK for Camb.ai - Advanced voice and audio generation APIs",
+  "description": "Official TypeScript SDK for Camb.ai - Advanced voice and audio generation APIs",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
