@@ -18,13 +18,13 @@ The official TypeScript SDK for interacting with Camb AI's powerful voice and au
 Install the SDK using npm (requires Node.js 18+):
 
 ```bash
-npm install @camb-ai/sdk
+npm install @camb-ai/sdk@1.0.0
 ```
 
 Or using yarn:
 
 ```bash
-yarn add @camb-ai/sdk
+yarn add @camb-ai/sdk@1.0.0
 ```
 
 ## 🔑 Authentication & Accessing Clients
