@@ -1,0 +1,13 @@
+{
+  "name": "voice-cloning-example",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "clone-voice": "node clone-voice.js",
+    "tts-with-reference": "node tts-with-reference-audio.js"
+  },
+  "dependencies": {
+    "@camb-ai/sdk": "^1.0.0",
+    "dotenv": "^16.6.1"
+  }
+}
