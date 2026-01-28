@@ -10,4 +10,5 @@
 export interface StreamTtsVoiceSettings {
     enhance_reference_audio_quality?: boolean | null;
     maintain_source_accent?: boolean | null;
+    apply_ref_loudness_norm?: boolean | null;
 }
