@@ -25,14 +25,18 @@ async function main() {
         const referenceAudio = fs.readFileSync(referenceAudioPath).toString('base64');
 
         console.log('Generating speech with Baseten provider...');
-        const response = await client.textToSpeech.tts({
+        const requestPayload = {
             text: 'Hello World and my dear friends',
             language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs,
             speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.Mars8,
             voice_id: 1, // Required but ignored when using custom provider
-        }, {
-            // pass as undocumented config or any cast? wait, baseten uses request as any. we can just pass them as any.
-        });
+            additional_body_parameters: {
+                reference_audio: referenceAudio,
+                reference_language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs  // required
+            }
+        };
+
+        const response = await client.textToSpeech.tts(requestPayload);
 
         const outputFile = 'baseten_output.wav';
         await saveStreamToFile(response, outputFile);
