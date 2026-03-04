@@ -1,4 +1,4 @@
-import { CambClient, saveStreamToFile } from '@camb-ai/sdk';
+import { CambClient, CambApi, saveStreamToFile } from '@camb-ai/sdk';
 
 // Initialize the async client
 const client = new CambClient({
@@ -16,15 +16,15 @@ async function main() {
             return;
         }
 
-        const voiceId = voices[0].id;
+        const voiceId = Number(voices[0].id);
         console.log(`>>> Using voice ID: ${voiceId}`);
 
         // Stream the TTS generation
         console.log('Streaming TTS generation...');
         const response = await client.textToSpeech.tts({
-            text: 'Experience high quality text to speech generation using MARS Pro Model.',
-            language: 'en-us',
-            speech_model: 'mars-pro',
+            text: 'Experience high quality text to speech generation using MARS Model.',
+            language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs,
+            speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.Mars8,
             voice_id: voiceId,
             output_configuration: {
                 format: 'wav'

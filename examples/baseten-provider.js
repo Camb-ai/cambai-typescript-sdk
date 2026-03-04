@@ -1,8 +1,9 @@
-import { CambClient, saveStreamToFile } from '@camb-ai/sdk';
+import { CambClient, CambApi, saveStreamToFile } from '@camb-ai/sdk';
 import * as fs from 'fs';
 
 // Initialize client with Baseten provider
 const client = new CambClient({
+    apiKey: process.env.CAMB_API_KEY || 'dummy_api_key', // apiKey is required in TS type
     ttsProvider: 'baseten',
     providerParams: {
         api_key: process.env.BASETEN_API_KEY || 'YOUR_BASETEN_API_KEY',
@@ -26,12 +27,11 @@ async function main() {
         console.log('Generating speech with Baseten provider...');
         const response = await client.textToSpeech.tts({
             text: 'Hello World and my dear friends',
-            language: 'en-us',
-            speech_model: 'mars-pro',
-            additional_body_parameters: {
-                reference_audio: referenceAudio,
-                reference_language: 'en-us'  // required
-            }
+            language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs,
+            speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.Mars8,
+            voice_id: 1, // Required but ignored when using custom provider
+        }, {
+            // pass as undocumented config or any cast? wait, baseten uses request as any. we can just pass them as any.
         });
 
         const outputFile = 'baseten_output.wav';
