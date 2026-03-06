@@ -95,6 +95,9 @@ export namespace CreateStreamTtsRequestPayload {
         Mars8Instruct: "mars-8-instruct",
         Mars7: "mars-7",
         Mars6: "mars-6",
+        MarsPro: "mars-pro",
+        MarsFlash: "mars-flash",
+        MarsInstruct: "mars-instruct",
     } as const;
     export type SpeechModel = (typeof SpeechModel)[keyof typeof SpeechModel];
 }

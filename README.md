@@ -18,13 +18,7 @@ The official TypeScript SDK for interacting with Camb AI's powerful voice and au
 Install the SDK using npm (requires Node.js 18+):
 
 ```bash
-npm install @camb-ai/sdk@1.0.1
-```
-
-Or using yarn:
-
-```bash
-yarn add @camb-ai/sdk@1.0.1
+npm install @camb-ai/sdk
 ```
 
 ## 🔑 Authentication & Accessing Clients
@@ -38,50 +32,66 @@ import { CambClient } from '@camb-ai/sdk';
 const client = new CambClient({ apiKey: 'YOUR_CAMB_API_KEY' });
 ```
 
-### Client with Specific MARS Pro Provider (e.g. Vertex, Baseten)
+### Client with Custom Hosting Provider (e.g. Baseten, Vertex)
 
 #### Baseten
 
-To deploy the model go to models from baseten example: https://www.baseten.co/library/mars6/ and deploy then perform setup like below
+To deploy the model go to models from baseten example: <https://www.baseten.co/library/mars6/> and deploy then perform setup like below
 
 ```javascript
-import { CambClient } from '@camb-ai/sdk';
+import { CambClient, CambApi, saveStreamToFile } from '@camb-ai/sdk';
 import * as fs from 'fs';
 
+// Initialize client with Baseten provider
 const client = new CambClient({
-  ttsProvider: 'baseten',
-  providerParams: {
-    apiKey: 'YOUR_BASETEN_API_KEY',
-    marsProUrl: 'YOUR_BASETEN_URL'
-  }
+    apiKey: process.env.CAMB_API_KEY, 
+    ttsProvider: 'baseten',
+    providerParams: {
+        api_key: process.env.BASETEN_API_KEY,
+        mars_pro_url: process.env.BASETEN_URL
+    }
 });
 
-// Call TTS with Baseten
-const audioBuffer = fs.readFileSync('audio.wav');
-const referenceAudio = Buffer.from(audioBuffer).toString('base64');
+async function main() {
+    try {
+        // Read reference audio file (you need to provide this)
+        const referenceAudioPath = process.env.REFERENCE_AUDIO_PATH || 'reference.wav';
 
-const response = await client.textToSpeech.tts({
-  text: 'Hello World and my dear friends',
-  language: 'en-us',
-  speechModel: 'mars-pro',
-  additionalBodyParameters: {
-    referenceAudio: referenceAudio,
-    referenceLanguage: 'en-us'  // required
-  },
-  timeoutInSeconds: 300
-});
-```
+        if (!fs.existsSync(referenceAudioPath)) {
+            console.error(`Reference audio file not found: ${referenceAudioPath}`);
+            console.log('Please provide a reference audio file or set REFERENCE_AUDIO_PATH environment variable');
+            return;
+        }
 
-#### Vertex Support (In Progress)
+        const referenceAudio = fs.readFileSync(referenceAudioPath).toString('base64');
 
-```javascript
-const client = new CambClient({
-  ttsProvider: 'vertex',
-  providerParams: {
-    projectId: 'my-project',
-    location: 'us-central1'
-  }
-});
+        console.log('Generating speech with Baseten provider...');
+        const requestPayload = {
+            text: 'Hello World and my dear friends',
+            language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs,
+            speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.MarsPro,
+            voice_id: 1, // Required but ignored when using custom hosting provider
+            additional_body_parameters: {
+                reference_audio: referenceAudio,
+                reference_language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs  // required
+            }
+        };
+
+        const response = await client.textToSpeech.tts(requestPayload);
+
+        const outputFile = 'baseten_output.wav';
+        await saveStreamToFile(response, outputFile);
+        console.log(`✓ Audio generated with Baseten provider and saved to ${outputFile}`);
+
+    } catch (error) {
+        console.error('Error:', error.message);
+        if (error.body) {
+            console.error('Details:', error.body);
+        }
+    }
+}
+
+main();
 ```
 
 ## 🚀 Getting Started: Examples
@@ -103,23 +113,23 @@ Convert text into spoken audio using one of Camb AI's high-quality voices.
 #### a) Get Audio and Save to File
 
 ```javascript
-import { CambApiClient, saveStreamToFile } from '@camb-ai/sdk';
+import { CambClient, CambApi, saveStreamToFile } from '@camb-ai/sdk';
 
 // Initialize client (ensure API key is set)
 const client = new CambClient({ apiKey: 'YOUR_CAMB_API_KEY' });
 
 const response = await client.textToSpeech.tts({
   text: 'Hello from Camb AI! This is a test of our Text-to-Speech API.',
-  voiceId: 20303,  // Example voice ID, get from client.voiceCloning.listVoices()
-  language: 'en-us',
-  speechModel: 'mars-pro',  // options: mars-pro, mars-flash, mars-instruct, auto
-  outputConfiguration: {
-    format: 'mp3'
+  voice_id: 20303,  // Example voice ID, get from client.voiceCloning.listVoices()
+  language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs,
+  speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.MarsPro,  // options: mars-pro, mars-flash, mars-instruct
+  output_configuration: {
+    format: 'wav'
   }
 });
 
-await saveStreamToFile(response, 'tts_output.mp3');
-console.log('Success! Audio saved to tts_output.mp3');
+await saveStreamToFile(response, 'tts_output.wav');
+console.log('Success! Audio saved to tts_output.wav');
 ```
 
 #### b) Using Mars Flash (Low Latency)
@@ -129,10 +139,10 @@ For applications requiring faster responses, switch to `mars-flash` (22.05kHz).
 ```javascript
 const response = await client.textToSpeech.tts({
   text: 'Hey! I can respond much faster.',
-  language: 'en-us',
-  speechModel: 'mars-flash',
-  voiceId: 20303,
-  outputConfiguration: {
+  language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs,
+  speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.MarsFlash,
+  voice_id: 20303,
+  output_configuration: {
     format: 'wav'
   }
 });
@@ -149,7 +159,7 @@ const voices = await client.voiceCloning.listVoices();
 console.log(`Found ${voices.length} voices:`);
 
 for (const voice of voices.slice(0, 5)) {  // Print first 5 as an example
-  console.log(`  - ID: ${voice.id}, Name: ${voice.voiceName}, Gender: ${voice.gender}, Language: ${voice.language}`);
+  console.log(`  - ID: ${voice.id}, Name: ${voice.voice_name}, Gender: ${voice.gender}, Language: ${voice.language}`);
 }
 ```
 
@@ -167,7 +177,7 @@ try {
   // Returns 3 sample URLs
   const result = await client.textToVoice.createTextToVoice({
     text: 'Crafting a truly unique and captivating voice that carries a subtle air of mystery, depth, and gentle warmth.',
-    voiceDescription: 'A smooth, rich baritone voice layered with a soft echo, ideal for immersive storytelling and emotional depth.'
+    voice_description: 'A smooth, rich baritone voice layered with a soft echo, ideal for immersive storytelling and emotional depth.'
   });
   console.log(result);
 } catch (error) {
@@ -180,24 +190,24 @@ try {
 Generate sound effects or ambient audio from a descriptive prompt.
 
 ```javascript
-import { CambApiClient, saveStreamToFile } from '@camb-ai/sdk';
+import { CambClient, saveStreamToFile } from '@camb-ai/sdk';
 
 const client = new CambClient({ apiKey: 'YOUR_CAMB_API_KEY' });
 
 const response = await client.textToAudio.createTextToAudio({
   prompt: 'A gentle breeze rustling through autumn leaves in a quiet forest.',
   duration: 10,
-  audioType: 'sound'
+  audio_type: 'sound'
 });
 
-const taskId = response.taskId;
+const taskId = response.task_id;
 if (taskId) {
   while (true) {
-    const status = await client.textToAudio.getTextToAudioStatus({ taskId });
+    const status = await client.textToAudio.getTextToAudioStatus({ task_id: taskId });
     console.log(`Status: ${status.status}`);
     
     if (status.status === 'SUCCESS') {
-      const result = await client.textToAudio.getTextToAudioResult(status.runId);
+      const result = await client.textToAudio.getTextToAudioResult({ run_id: status.run_id });
       await saveStreamToFile(result, 'sound_effect.mp3');
       console.log('Success! Sound effect saved to sound_effect.mp3');
       break;
@@ -213,28 +223,28 @@ if (taskId) {
 Dub videos into different languages with voice cloning and translation capabilities.
 
 ```javascript
-import { CambClient } from '@camb-ai/sdk';
+import { CambClient, CambApi } from '@camb-ai/sdk';
 
 const client = new CambClient({ apiKey: 'YOUR_CAMB_API_KEY' });
 
-const response = await client.dub.createDub({
-  videoUrl: 'your_accessible_video_url',
-  sourceLanguage: 'en-us',  // Check client.languages.getSourceLanguages()
-  targetLanguage: 'hi-in'   // Example target language
+const response = await client.dub.endToEndDubbing({
+  video_url: 'your_accessible_video_url',
+  source_language: CambApi.Languages.EN_US,  // Check client.languages.getSourceLanguages()
+  target_language: CambApi.Languages.HI_IN   // Example target language
 });
 
-const taskId = response.taskId;
+const taskId = response.task_id;
 console.log(`Dub Task created with ID: ${taskId}`);
 
 while (true) {
-  const statusResponse = await client.dub.getDubbingStatus({ taskId });
+  const statusResponse = await client.dub.getDubbingStatus({ task_id: taskId });
   console.log(`Current Status: ${statusResponse.status}`);
   
   if (statusResponse.status === 'SUCCESS') {
-    const dubbedRunInfo = await client.dub.getDubbedRunInfo(statusResponse.runId);
-    console.log(`Dubbed Audio URL: ${dubbedRunInfo.audioUrl}`);
+    const dubbedRunInfo = await client.dub.getDubbedRunInfo({ run_id: statusResponse.run_id });
+    console.log(`Dubbed Audio URL: ${dubbedRunInfo.audio_url}`);
     console.log(`Transcript: ${dubbedRunInfo.transcript}`);
-    console.log(`Dubbed Video URL: ${dubbedRunInfo.videoUrl}`);
+    console.log(`Dubbed Video URL: ${dubbedRunInfo.video_url}`);
     break;
   }
   
@@ -259,16 +269,16 @@ Please refer to the [Official Camb AI API Documentation](https://docs.camb.ai) f
 This SDK is written in TypeScript and includes full type definitions. You can use it in TypeScript projects with full IntelliSense support:
 
 ```typescript
-import { CambApiClient, CambApi } from '@camb-ai/sdk';
+import { CambClient, CambApi } from '@camb-ai/sdk';
 
-const client = new CambApiClient({ apiKey: 'YOUR_CAMB_API_KEY' });
+const client = new CambClient({ apiKey: 'YOUR_CAMB_API_KEY' });
 
 // Full type safety
 const response: AsyncIterable<Uint8Array> = await client.textToSpeech.tts({
   text: 'Hello world',
-  language: 'en-us',
-  speechModel: 'mars-pro',
-  voiceId: 20303
+  language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs,
+  speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.MarsPro,
+  voice_id: 20303
 });
 ```
 
@@ -277,17 +287,15 @@ const response: AsyncIterable<Uint8Array> = await client.textToSpeech.tts({
 Check out the `examples/` directory for complete, runnable examples:
 
 - `basic-tts.js` - Basic text-to-speech example
-- `async-tts.js` - Async TTS with streaming
 - `text-to-audio.js` - Sound generation example
 - `dubbing.js` - Video dubbing workflow
-- `baseten-provider.js` - Using custom providers
+- `baseten-provider.js` - Using custom hosting providers
 
 ## 🔗 Links
 
 - [Documentation](https://docs.camb.ai)
-- [GitHub Repository](https://github.com/Camb-ai/cambai-node-sdk)
+- [GitHub Repository](https://github.com/Camb-ai/cambai-typescript-sdk)
 - [Python SDK](https://github.com/Camb-ai/cambai-python-sdk)
-- [Discord Community](https://discord.gg/hzXnxTxhFw)
 
 ## License
 

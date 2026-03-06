@@ -15,7 +15,7 @@ async function testTextToAudio() {
         });
 
         console.log('Response:', JSON.stringify(response, null, 2));
-        const taskId = response.task_id || response.taskId;
+        const taskId = response.task_id;
         console.log(`Task created with ID: ${taskId}`);
 
         if (!taskId) {
@@ -37,7 +37,7 @@ async function testTextToAudio() {
 
             if (statusResponse.status === 'SUCCESS') {
                 console.log('Task completed! Downloading result...');
-                const runId = statusResponse.run_id || statusResponse.runId;
+                const runId = statusResponse.run_id;
                 const result = await client.textToAudio.getTextToAudioResult({
                     run_id: runId
                 });
@@ -46,7 +46,7 @@ async function testTextToAudio() {
                 await saveStreamToFile(result, outputFile);
                 console.log(`✓ Audio saved to ${outputFile}`);
                 break;
-            } else if (statusResponse.status === 'FAILED') {
+            } else if (statusResponse.status === 'ERROR') {
                 console.error('Task failed!');
                 break;
             }

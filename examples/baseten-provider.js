@@ -1,12 +1,26 @@
-import { CambClient, saveStreamToFile } from '@camb-ai/sdk';
+import { CambClient, CambApi, saveStreamToFile } from '@camb-ai/sdk';
 import * as fs from 'fs';
+
+// Check for required environment variables
+const cambApiKey = process.env.CAMB_API_KEY;
+const basetenApiKey = process.env.BASETEN_API_KEY;
+const basetenUrl = process.env.BASETEN_URL;
+
+if (!cambApiKey || !basetenApiKey || !basetenUrl) {
+    console.error('Missing required environment variables:');
+    if (!cambApiKey) console.error('- CAMB_API_KEY');
+    if (!basetenApiKey) console.error('- BASETEN_API_KEY');
+    if (!basetenUrl) console.error('- BASETEN_URL (e.g. your Baseten model endpoint URL)');
+    process.exit(1);
+}
 
 // Initialize client with Baseten provider
 const client = new CambClient({
+    apiKey: cambApiKey,
     ttsProvider: 'baseten',
     providerParams: {
-        api_key: process.env.BASETEN_API_KEY || 'YOUR_BASETEN_API_KEY',
-        mars_pro_url: process.env.BASETEN_URL || 'YOUR_BASETEN_MARS_PRO_URL'
+        api_key: basetenApiKey,
+        mars_pro_url: basetenUrl
     }
 });
 
@@ -24,15 +38,18 @@ async function main() {
         const referenceAudio = fs.readFileSync(referenceAudioPath).toString('base64');
 
         console.log('Generating speech with Baseten provider...');
-        const response = await client.textToSpeech.tts({
+        const requestPayload = {
             text: 'Hello World and my dear friends',
-            language: 'en-us',
-            speech_model: 'mars-pro',
+            language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs,
+            speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.MarsPro,
+            voice_id: 1, // Required but ignored when using custom hosting provider
             additional_body_parameters: {
                 reference_audio: referenceAudio,
-                reference_language: 'en-us'  // required
+                reference_language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs  // required
             }
-        });
+        };
+
+        const response = await client.textToSpeech.tts(requestPayload);
 
         const outputFile = 'baseten_output.wav';
         await saveStreamToFile(response, outputFile);

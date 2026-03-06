@@ -1,4 +1,4 @@
-import { CambClient } from '@camb-ai/sdk';
+import { CambClient, CambApi } from '@camb-ai/sdk';
 
 const client = new CambClient({
     apiKey: process.env.CAMB_API_KEY
@@ -8,15 +8,14 @@ async function testDubbing() {
     try {
         console.log('Creating dubbing task...');
         // Note: source_language and target_language are numeric IDs
-        // 47 = English (US), 39 = Hindi (India)
         const response = await client.dub.endToEndDubbing({
             video_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',  // Replace with your video URL
-            source_language: 47,  // English (US)
-            target_language: 39   // Hindi (India)
+            source_language: CambApi.Languages.EN_US,
+            target_language: CambApi.Languages.HI_IN
         });
 
         console.log('Response:', JSON.stringify(response, null, 2));
-        const taskId = response.task_id || response.taskId;
+        const taskId = response.task_id;
         console.log(`Dubbing task created with ID: ${taskId}`);
 
         if (!taskId) {
@@ -38,7 +37,7 @@ async function testDubbing() {
 
             if (statusResponse.status === 'SUCCESS') {
                 console.log('Dubbing completed!');
-                const runId = statusResponse.run_id || statusResponse.runId;
+                const runId = statusResponse.run_id;
                 console.log(`Run ID: ${runId}`);
 
                 // Get dubbed video info
@@ -49,8 +48,9 @@ async function testDubbing() {
                 console.log('Dubbed video info:', JSON.stringify(result, null, 2));
                 console.log(`✓ Dubbing successful! Run ID: ${runId}`);
                 break;
-            } else if (statusResponse.status === 'FAILED') {
+            } else if (statusResponse.status === 'ERROR') {
                 console.error('Dubbing task failed!');
+                console.error('Details:', JSON.stringify(statusResponse, null, 2));
                 break;
             }
 
