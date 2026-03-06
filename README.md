@@ -32,7 +32,7 @@ import { CambClient } from '@camb-ai/sdk';
 const client = new CambClient({ apiKey: 'YOUR_CAMB_API_KEY' });
 ```
 
-### Client with Specific MARS Pro Provider (e.g. Vertex, Baseten)
+### Client with Custom Hosting Provider (e.g. Baseten, Vertex)
 
 #### Baseten
 
@@ -44,11 +44,11 @@ import * as fs from 'fs';
 
 // Initialize client with Baseten provider
 const client = new CambClient({
-    apiKey: process.env.CAMB_API_KEY || 'dummy_api_key', // apiKey is required in TS type
+    apiKey: process.env.CAMB_API_KEY, 
     ttsProvider: 'baseten',
     providerParams: {
-        api_key: process.env.BASETEN_API_KEY || 'YOUR_BASETEN_API_KEY',
-        mars_pro_url: process.env.BASETEN_URL || 'YOUR_BASETEN_MARS_PRO_URL'
+        api_key: process.env.BASETEN_API_KEY,
+        mars_pro_url: process.env.BASETEN_URL
     }
 });
 
@@ -70,7 +70,7 @@ async function main() {
             text: 'Hello World and my dear friends',
             language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs,
             speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.MarsPro,
-            voice_id: 1, // Required but ignored when using custom provider
+            voice_id: 1, // Required but ignored when using custom hosting provider
             additional_body_parameters: {
                 reference_audio: referenceAudio,
                 reference_language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs  // required
@@ -289,7 +289,7 @@ Check out the `examples/` directory for complete, runnable examples:
 - `basic-tts.js` - Basic text-to-speech example
 - `text-to-audio.js` - Sound generation example
 - `dubbing.js` - Video dubbing workflow
-- `baseten-provider.js` - Using custom providers
+- `baseten-provider.js` - Using custom hosting providers
 
 ## 🔗 Links
 

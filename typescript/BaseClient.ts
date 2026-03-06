@@ -19,9 +19,9 @@ export type BaseClientOptions = {
     fetch?: typeof fetch;
     /** Configure logging for the client. */
     logging?: core.logging.LogConfig | core.logging.Logger;
-    /** Custom TTS provider (e.g., 'baseten', 'vertex'). If specified, providerParams must also be provided. */
+    /** Custom TTS hosting provider (e.g., 'baseten', 'vertex'). If specified, providerParams must also be provided. */
     ttsProvider?: string;
-    /** Parameters for the custom TTS provider (e.g., API key, URL). Required if ttsProvider is specified. */
+    /** Parameters for the custom TTS hosting provider (e.g., API key, URL). Required if ttsProvider is specified. */
     providerParams?: Record<string, any>;
 } & HeaderAuthProvider.AuthOptions;
 
