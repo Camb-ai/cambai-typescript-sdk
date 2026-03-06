@@ -1,7 +1,14 @@
 # Camb.ai TypeScript SDK
 
+<div id="top" align="center">
+
+   ![Banner](assets/banner5_720.jpg)
+   <h3>
+   <a href="https://camb.ai/"> Camb AI Website </a></h3>
+
 [![npm version](https://img.shields.io/npm/v/@camb-ai/sdk.svg?style=flat-square)](https://www.npmjs.com/package/@camb-ai/sdk)
 [![License](https://img.shields.io/npm/l/@camb-ai/sdk.svg?style=flat-square)](https://github.com/Camb-ai/cambai-node-sdk/blob/main/LICENSE)
+</div>
 
 The official TypeScript SDK for interacting with Camb AI's powerful voice and audio generation APIs. Create expressive speech, unique voices, and rich soundscapes with just a few lines of code. Works seamlessly in Node.js environments (18+).
 
