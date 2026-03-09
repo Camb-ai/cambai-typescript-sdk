@@ -40,12 +40,12 @@ async function main() {
         console.log('Generating speech with Baseten provider...');
         const requestPayload = {
             text: 'Hello World and my dear friends',
-            language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs,
-            speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.MarsPro,
+            language: CambApi.TtsLanguage.EnUs,
+            speech_model: CambApi.SpeechModel.MarsPro,
             voice_id: 1, // Required but ignored when using custom hosting provider
             additional_body_parameters: {
                 reference_audio: referenceAudio,
-                reference_language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs  // required
+                reference_language: CambApi.TtsLanguage.EnUs  // required
             }
         };
 

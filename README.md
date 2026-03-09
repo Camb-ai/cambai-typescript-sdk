@@ -75,12 +75,12 @@ async function main() {
         console.log('Generating speech with Baseten provider...');
         const requestPayload = {
             text: 'Hello World and my dear friends',
-            language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs,
-            speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.MarsPro,
+            language: CambApi.TtsLanguage.EnUs,
+            speech_model: CambApi.SpeechModel.MarsPro,
             voice_id: 1, // Required but ignored when using custom hosting provider
             additional_body_parameters: {
                 reference_audio: referenceAudio,
-                reference_language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs  // required
+                reference_language: CambApi.TtsLanguage.EnUs  // required
             }
         };
 
@@ -128,8 +128,8 @@ const client = new CambClient({ apiKey: 'YOUR_CAMB_API_KEY' });
 const response = await client.textToSpeech.tts({
   text: 'Hello from Camb AI! This is a test of our Text-to-Speech API.',
   voice_id: 20303,  // Example voice ID, get from client.voiceCloning.listVoices()
-  language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs,
-  speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.MarsPro,  // options: mars-pro, mars-flash, mars-instruct
+  language: CambApi.TtsLanguage.EnUs,
+  speech_model: CambApi.SpeechModel.MarsPro,  // options: mars-pro, mars-flash, mars-instruct
   output_configuration: {
     format: 'wav'
   }
@@ -146,8 +146,8 @@ For applications requiring faster responses, switch to `mars-flash` (22.05kHz).
 ```javascript
 const response = await client.textToSpeech.tts({
   text: 'Hey! I can respond much faster.',
-  language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs,
-  speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.MarsFlash,
+  language: CambApi.TtsLanguage.EnUs,
+  speech_model: CambApi.SpeechModel.MarsFlash,
   voice_id: 20303,
   output_configuration: {
     format: 'wav'
@@ -283,8 +283,8 @@ const client = new CambClient({ apiKey: 'YOUR_CAMB_API_KEY' });
 // Full type safety
 const response: AsyncIterable<Uint8Array> = await client.textToSpeech.tts({
   text: 'Hello world',
-  language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs,
-  speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.MarsPro,
+  language: CambApi.TtsLanguage.EnUs,
+  speech_model: CambApi.SpeechModel.MarsPro,
   voice_id: 20303
 });
 ```

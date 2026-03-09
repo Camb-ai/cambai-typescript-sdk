@@ -1,4 +1,4 @@
-export * from "./CreateStreamTtsRequestPayload.js";
+export type { CreateStreamTtsRequestPayload } from "./CreateStreamTtsRequestPayload.js";
 export type { CreateTtsRequestPayload } from "./CreateTtsRequestPayload.js";
 export type { GetTtsResultDiscordDiscordTtsTaskIdGetRequest } from "./GetTtsResultDiscordDiscordTtsTaskIdGetRequest.js";
 export type { GetTtsResultsTtsResultsPostRequest } from "./GetTtsResultsTtsResultsPostRequest.js";

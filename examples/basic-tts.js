@@ -25,8 +25,8 @@ async function main() {
         const response = await client.textToSpeech.tts({
             text: 'Hello from Camb AI! This is a demonstration of our advanced text-to-speech technology using the MARS Pro model.',
             voice_id: voiceId,
-            language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs,
-            speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.MarsPro,
+            language: CambApi.TtsLanguage.EnUs,
+            speech_model: CambApi.SpeechModel.MarsPro,
             output_configuration: {
                 format: 'wav'
             }
