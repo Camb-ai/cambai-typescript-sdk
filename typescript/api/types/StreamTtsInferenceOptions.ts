@@ -20,6 +20,4 @@ export interface StreamTtsInferenceOptions {
     temperature?: number | null;
     inference_steps?: number | null;
     speaker_similarity?: number | null;
-    localize_speaker_weight?: number | null;
-    acoustic_quality_boost?: boolean | null;
 }

@@ -8,21 +8,14 @@ export namespace HeaderAuthProvider {
         apiKey: core.Supplier<string>;
     }
 
-    export interface Options extends AuthOptions {
-        ttsProvider?: string;
-        providerParams?: Record<string, any>;
-    }
+    export interface Options extends AuthOptions {}
 }
 
 export class HeaderAuthProvider implements core.AuthProvider {
     private readonly headerValue: core.Supplier<string>;
-    private readonly ttsProvider?: string;
-    private readonly providerParams?: Record<string, any>;
 
     constructor(options: HeaderAuthProvider.Options) {
         this.headerValue = options.apiKey;
-        this.ttsProvider = options.ttsProvider;
-        this.providerParams = options.providerParams;
     }
 
     public static canCreate(options: HeaderAuthProvider.Options): boolean {
@@ -30,19 +23,17 @@ export class HeaderAuthProvider implements core.AuthProvider {
     }
 
     public async getAuthRequest(_arg?: { endpointMetadata?: core.EndpointMetadata }): Promise<core.AuthRequest> {
-        const headers: Record<string, string> = {};
-
-        // Add API key if provided
         const apiKey = await core.Supplier.get(this.headerValue);
-        if (apiKey != null) {
-            headers["x-api-key"] = apiKey;
+        if (apiKey == null) {
+            throw new errors.CambApiError({
+                message: "Please specify a apiKey by passing it in to the constructor",
+            });
         }
 
-        // Add custom provider header if configured
-        if (this.ttsProvider) {
-            headers["tts_provider"] = this.ttsProvider;
-        }
+        const headerValue = apiKey;
 
-        return { headers };
+        return {
+            headers: { "x-api-key": headerValue },
+        };
     }
 }

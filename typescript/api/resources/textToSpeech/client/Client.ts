@@ -8,13 +8,11 @@ import * as environments from "../../../../environments.js";
 import { handleNonStatusCodeError } from "../../../../errors/handleNonStatusCodeError.js";
 import * as errors from "../../../../errors/index.js";
 import * as CambApi from "../../../index.js";
-import { basetenTts } from "../providers/baseten.js";
-import { vertexTts } from "../providers/vertex.js";
 
 export declare namespace TextToSpeechClient {
     export type Options = BaseClientOptions;
 
-    export interface RequestOptions extends BaseRequestOptions { }
+    export interface RequestOptions extends BaseRequestOptions {}
 }
 
 export class TextToSpeechClient {
@@ -38,25 +36,6 @@ export class TextToSpeechClient {
         request: CambApi.CreateStreamTtsRequestPayload,
         requestOptions?: TextToSpeechClient.RequestOptions,
     ): Promise<core.WithRawResponse<core.BinaryResponse>> {
-        // Get provider config from options
-        const ttsProvider = (this._options as any).ttsProvider;
-        const providerParams = (this._options as any).providerParams;
-
-        // Validate voice_id requirement for default provider
-        if (!ttsProvider && !request.voice_id) {
-            throw new Error("voice_id is required when using the default Camb.ai provider.");
-        }
-
-        // Route to custom provider if configured
-        if (ttsProvider === "baseten") {
-            return basetenTts(request as any, providerParams, requestOptions);
-        }
-
-        if (ttsProvider === "vertex") {
-            return vertexTts(request, providerParams, requestOptions);
-        }
-
-        // Default Camb.ai provider
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -66,8 +45,8 @@ export class TextToSpeechClient {
         const _response = await core.fetcher<core.BinaryResponse>({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
-                (await core.Supplier.get(this._options.environment)) ??
-                environments.CambApiEnvironment.Default,
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.CambApiEnvironment.Default,
                 "tts-stream",
             ),
             method: "POST",
@@ -77,7 +56,7 @@ export class TextToSpeechClient {
             requestType: "json",
             body: request,
             responseType: "binary-response",
-            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 300) * 1000,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
             fetchFn: this._options?.fetch,
@@ -145,8 +124,8 @@ export class TextToSpeechClient {
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
-                (await core.Supplier.get(this._options.environment)) ??
-                environments.CambApiEnvironment.Default,
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.CambApiEnvironment.Default,
                 "tts",
             ),
             method: "POST",
@@ -155,7 +134,7 @@ export class TextToSpeechClient {
             queryParameters: { ..._queryParams, ...requestOptions?.queryParams },
             requestType: "json",
             body: _body,
-            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 300) * 1000,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
             fetchFn: this._options?.fetch,
@@ -221,14 +200,14 @@ export class TextToSpeechClient {
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
-                (await core.Supplier.get(this._options.environment)) ??
-                environments.CambApiEnvironment.Default,
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.CambApiEnvironment.Default,
                 `tts/${core.url.encodePathParam(taskId)}`,
             ),
             method: "GET",
             headers: _headers,
             queryParameters: { ..._queryParams, ...requestOptions?.queryParams },
-            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 300) * 1000,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
             fetchFn: this._options?.fetch,
@@ -322,14 +301,14 @@ export class TextToSpeechClient {
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
-                (await core.Supplier.get(this._options.environment)) ??
-                environments.CambApiEnvironment.Default,
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.CambApiEnvironment.Default,
                 `tts-result/${core.url.encodePathParam(runId)}`,
             ),
             method: "GET",
             headers: _headers,
             queryParameters: { ..._queryParams, ...requestOptions?.queryParams },
-            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 300) * 1000,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
             fetchFn: this._options?.fetch,
@@ -377,14 +356,14 @@ export class TextToSpeechClient {
     public getTtsResults(
         request: CambApi.GetTtsResultsTtsResultsPostRequest,
         requestOptions?: TextToSpeechClient.RequestOptions,
-    ): core.HttpResponsePromise<Record<string, unknown>> {
+    ): core.HttpResponsePromise<Record<string, CambApi.GetTtsResultsTtsResultsPostResponseValue>> {
         return core.HttpResponsePromise.fromPromise(this.__getTtsResults(request, requestOptions));
     }
 
     private async __getTtsResults(
         request: CambApi.GetTtsResultsTtsResultsPostRequest,
         requestOptions?: TextToSpeechClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Record<string, unknown>>> {
+    ): Promise<core.WithRawResponse<Record<string, CambApi.GetTtsResultsTtsResultsPostResponseValue>>> {
         const { run_id: runId, traceparent, body: _body } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (runId !== undefined) {
@@ -401,8 +380,8 @@ export class TextToSpeechClient {
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
-                (await core.Supplier.get(this._options.environment)) ??
-                environments.CambApiEnvironment.Default,
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.CambApiEnvironment.Default,
                 "tts-results",
             ),
             method: "POST",
@@ -411,7 +390,7 @@ export class TextToSpeechClient {
             queryParameters: { ..._queryParams, ...requestOptions?.queryParams },
             requestType: "json",
             body: _body,
-            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 300) * 1000,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
             fetchFn: this._options?.fetch,
@@ -419,7 +398,7 @@ export class TextToSpeechClient {
         });
         if (_response.ok) {
             return {
-                data: _response.body as Record<string, unknown>,
+                data: _response.body as Record<string, CambApi.GetTtsResultsTtsResultsPostResponseValue>,
                 rawResponse: _response.rawResponse,
             };
         }
@@ -480,14 +459,14 @@ export class TextToSpeechClient {
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
-                (await core.Supplier.get(this._options.environment)) ??
-                environments.CambApiEnvironment.Default,
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.CambApiEnvironment.Default,
                 `discord/tts/${core.url.encodePathParam(taskId)}`,
             ),
             method: "GET",
             headers: _headers,
             queryParameters: { ..._queryParams, ...requestOptions?.queryParams },
-            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 300) * 1000,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
             fetchFn: this._options?.fetch,
