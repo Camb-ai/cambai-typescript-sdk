@@ -90,6 +90,8 @@ export namespace CreateStreamTtsRequestPayload {
     export type Language = (typeof Language)[keyof typeof Language];
     export const SpeechModel = {
         Auto: "auto",
+        Mars81ProBeta: "mars-8.1-pro-beta",
+        Mars81FlashBeta: "mars-8.1-flash-beta",
         Mars8: "mars-8",
         Mars8Flash: "mars-8-flash",
         Mars8Instruct: "mars-8-instruct",
