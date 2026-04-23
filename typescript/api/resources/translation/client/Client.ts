@@ -112,14 +112,14 @@ export class TranslationClient {
     public createTranslation(
         request: CambApi.CreateTranslationRequestPayload,
         requestOptions?: TranslationClient.RequestOptions,
-    ): core.HttpResponsePromise<unknown> {
+    ): core.HttpResponsePromise<CambApi.OrchestratorPipelineCallResult> {
         return core.HttpResponsePromise.fromPromise(this.__createTranslation(request, requestOptions));
     }
 
     private async __createTranslation(
         request: CambApi.CreateTranslationRequestPayload,
         requestOptions?: TranslationClient.RequestOptions,
-    ): Promise<core.WithRawResponse<unknown>> {
+    ): Promise<core.WithRawResponse<CambApi.OrchestratorPipelineCallResult>> {
         const { run_id: runId, ..._body } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (runId !== undefined) {
@@ -152,7 +152,10 @@ export class TranslationClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body, rawResponse: _response.rawResponse };
+            return {
+                data: _response.body as CambApi.OrchestratorPipelineCallResult,
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
