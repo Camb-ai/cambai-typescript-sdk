@@ -21,7 +21,6 @@ See the [TypeScript SDK guide](https://docs.camb.ai/sdk-guides/typescript-sdk) f
 - **Dubbing** — Localize video with translated speech matched to the original speaker.
 - **Translation** — Batch-translate strings across supported language pairs.
 - **Transcription** — Transcribe audio or video from a URL or upload.
-- **Voice cloning** — Create custom voices and browse your voice library.
 - **Audio separation** — Split a mix into stems such as vocals and background.
 - **Stories & folders** — Build long-form narration from documents and organize projects.
 - **Custom providers** — Point TTS at your own MARS deployment (for example on Baseten) via `providerParams`.
@@ -160,6 +159,8 @@ void main();
 | Dubbing | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#dubbing) | [`examples/dubbing.ts`](examples/dubbing.ts) |
 | Translation | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#translation) | [`examples/translation.ts`](examples/translation.ts) |
 | Transcription | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#transcription) | [`examples/transcription.ts`](examples/transcription.ts) |
+| Audio separation | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#audio-separation) | [`examples/audio-separation.ts`](examples/audio-separation.ts) |
+| Stories | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#stories) | [`examples/story.ts`](examples/story.ts) |
 | Custom provider (Baseten) | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#custom-provider) | [`examples/baseten-provider.ts`](examples/baseten-provider.ts) |
 
 Self-hosted MARS deployments are covered in [Custom Cloud Providers](https://docs.camb.ai/custom-cloud-providers).
