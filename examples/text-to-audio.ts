@@ -4,11 +4,12 @@ const POLL_MS = 2000;
 
 const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
 
-async function main(): Promise<void> {
-  const client = new CambClient({
-    apiKey: process.env.CAMB_API_KEY,
-  });
+const client = new CambClient({
+  apiKey: process.env.CAMB_API_KEY,
+});
 
+async function main(): Promise<void> {
+  // audio_type: "sound" or "music"
   const submitted = await client.textToAudio.createTextToAudio({
     prompt: "A futuristic sci-fi laser sound effect",
     duration: 3.0,
@@ -27,8 +28,7 @@ async function main(): Promise<void> {
   }
 
   const stream = await client.textToAudio.getTextToAudioResult({ run_id: runId! });
-  const outPath = "text_to_audio_output.mp3";
-  await saveStreamToFile(stream, outPath);
+  await saveStreamToFile(stream, "text_to_audio_output.mp3");
 }
 
 void main();

@@ -124,16 +124,18 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function main() {
   const submitted = await client.dub.endToEndDubbing({
-    video_url: process.env.VIDEO_URL!,
+    video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", // Replace with your video URL
     source_language: CambApi.Languages.EN_US,
     target_language: CambApi.Languages.HI_IN,
   });
+  console.log(`Dubbing task created with ID: ${submitted.task_id}`);
 
   let runId: number | undefined;
   while (true) {
     const status = await client.dub.getEndToEndDubbingStatus({
       task_id: submitted.task_id!,
     });
+    console.log(`Current Status: ${status.status}`);
     if (status.status === CambApi.TaskStatus.Success) {
       runId = status.run_id ?? undefined;
       break;
@@ -142,7 +144,8 @@ async function main() {
   }
 
   const info = await client.dub.getDubbedRunInfo({ run_id: runId! });
-  console.log(info.video_url ?? info.audio_url);
+  console.log(info.video_url);
+  console.log(info.audio_url);
 }
 
 void main();

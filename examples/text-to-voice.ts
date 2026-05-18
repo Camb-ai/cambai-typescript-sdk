@@ -1,4 +1,3 @@
-import { writeFileSync } from "node:fs";
 import { CambClient, CambApi } from "@camb-ai/sdk";
 
 const POLL_MS = 3000;
@@ -26,11 +25,11 @@ performing for a crowd. Low breath noise, minimal sibilance, consistent volume,
 and a soft, natural smile in the voice without sounding cheerful or salesy.
 `.trim();
 
-async function main(): Promise<void> {
-  const client = new CambClient({
-    apiKey: process.env.CAMB_API_KEY!,
-  });
+const client = new CambClient({
+  apiKey: process.env.CAMB_API_KEY,
+});
 
+async function main(): Promise<void> {
   const submitted = await client.textToVoice.createTextToVoice({
     text: SPEECH_TEXT,
     voice_description: VOICE_DESCRIPTION,

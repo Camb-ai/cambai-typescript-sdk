@@ -1,19 +1,24 @@
 import { createReadStream } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { CambClient, CambApi } from "@camb-ai/sdk";
+
+const resourcesDir = join(dirname(fileURLToPath(import.meta.url)), "resources");
+const storyFile = join(resourcesDir, "sample_story.txt");
 
 const POLL_MS = 5000;
 
 const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
 
-async function main(): Promise<void> {
-  const client = new CambClient({
-    apiKey: process.env.CAMB_API_KEY,
-  });
+const client = new CambClient({
+  apiKey: process.env.CAMB_API_KEY,
+});
 
+async function main(): Promise<void> {
   const submitted = await client.story.createStory({
-    file: createReadStream(process.env.STORY_FILE_PATH!),
+    file: createReadStream(storyFile),
     source_language: CambApi.Languages.EN_US,
-    title: process.env.STORY_TITLE ?? "My Story",
+    title: "My Story",
   });
   const taskId = submitted.task_id!;
 
