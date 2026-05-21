@@ -6,10 +6,10 @@ async function main(): Promise<void> {
   });
 
   const stream = await client.textToSpeech.tts({
-    text: "Hello from the Camb TypeScript SDK.",
+    text: "[confirmation] Your booking is confirmed for Friday at 3 PM.",
     language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs,
     voice_id: 147320, // get more voices: await client.voiceCloning.listVoices()
-    speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.MarsFlash,
+    speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.Mars81FlashBeta,
     output_configuration: { format: "mp3" },
   });
 

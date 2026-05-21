@@ -10,7 +10,7 @@
 
 The official TypeScript and Node.js client for [Camb.ai](https://camb.ai/). It wraps our REST APIs with typed models, ES module exports, and helpers for streaming audio to disk. Requires **Node.js 18+**.
 
-See the [TypeScript SDK guide](https://docs.camb.ai/sdk-guides/typescript-sdk) for full patterns. Explore the examples in [`examples/`](examples/).
+See the [TypeScript SDK guide](https://docs.camb.ai/sdk-guides/typescript-sdk) for full patterns. Explore the examples in `[examples/](examples/)`.
 
 ## Features
 
@@ -66,10 +66,10 @@ const client = new CambClient({
 
 async function main() {
   const stream = await client.textToSpeech.tts({
-    text: "Hello from the Camb TypeScript SDK.",
+    text: "[laughter] Hello from the Camb TypeScript SDK.",
     language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs,
     voice_id: 147320, // browse voices: await client.voiceCloning.listVoices()
-    speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.MarsFlash,
+    speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.Mars81FlashBeta,
     output_configuration: { format: "wav" },
   });
   await saveStreamToFile(stream, "output.wav");
@@ -77,6 +77,20 @@ async function main() {
 
 void main();
 ```
+
+**Available models**
+
+
+| Model                 | Sample rate | Best for                                                                                                          |
+| --------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------- |
+| `mars-8.1-flash-beta` | 48kHz       | Best all-around: stronger pronunciation, accent coverage, and prosody. Faster than pro-beta. Good starting point. |
+| `mars-8.1-pro-beta`   | 48kHz       | Same quality improvements as flash-beta; use when fidelity matters more than speed.                               |
+| `mars-flash`          | 22.05–48kHz | Real-time agents and call centers. Lowest latency (~150ms TTFB on Blackwell GPUs).                                |
+| `mars-pro`            | 48kHz       | Expressive dubbing, audiobooks, and digital media where TTFB is less critical.                                    |
+| `mars-instruct`       | 22.05kHz    | Emotion and prosody control via embedded text tags — film/broadcast post-production.                              |
+
+
+See [Choosing a Model](https://docs.camb.ai/choosing-a-model) for a detailed comparison.
 
 ### Translation
 
@@ -124,7 +138,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function main() {
   const submitted = await client.dub.endToEndDubbing({
-    video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", // Replace with your video URL
+    video_url: "https://www.youtube.com/watch?v=......", // Replace with your video URL
     source_language: CambApi.Languages.EN_US,
     target_language: CambApi.Languages.HI_IN,
   });
@@ -153,21 +167,22 @@ void main();
 
 ## API overview
 
-| Feature | Documentation | Example |
-| --- | --- | --- |
-| Streaming TTS | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#quick-start) | [`examples/basic-tts.ts`](examples/basic-tts.ts) |
-| Translated TTS | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#translated-tts) | [`examples/translated-tts.ts`](examples/translated-tts.ts) |
-| Text-to-audio | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#text-to-audio) | [`examples/text-to-audio.ts`](examples/text-to-audio.ts) |
-| Text-to-voice | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#text-to-voice) | [`examples/text-to-voice.ts`](examples/text-to-voice.ts) |
-| Dubbing | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#dubbing) | [`examples/dubbing.ts`](examples/dubbing.ts) |
-| Translation | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#translation) | [`examples/translation.ts`](examples/translation.ts) |
-| Transcription | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#transcription) | [`examples/transcription.ts`](examples/transcription.ts) |
-| Audio separation | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#audio-separation) | [`examples/audio-separation.ts`](examples/audio-separation.ts) |
-| Stories | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#stories) | [`examples/story.ts`](examples/story.ts) |
-| Custom provider (Baseten) | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#custom-provider) | [`examples/baseten-provider.ts`](examples/baseten-provider.ts) |
+
+| Feature                   | Documentation                                                            | Example                                                        |
+| ------------------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------- |
+| Streaming TTS             | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#quick-start)      | `[examples/basic-tts.ts](examples/basic-tts.ts)`               |
+| Translated TTS            | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#translated-tts)   | `[examples/translated-tts.ts](examples/translated-tts.ts)`     |
+| Text-to-audio             | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#text-to-audio)    | `[examples/text-to-audio.ts](examples/text-to-audio.ts)`       |
+| Text-to-voice             | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#text-to-voice)    | `[examples/text-to-voice.ts](examples/text-to-voice.ts)`       |
+| Dubbing                   | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#dubbing)          | `[examples/dubbing.ts](examples/dubbing.ts)`                   |
+| Translation               | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#translation)      | `[examples/translation.ts](examples/translation.ts)`           |
+| Transcription             | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#transcription)    | `[examples/transcription.ts](examples/transcription.ts)`       |
+| Audio separation          | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#audio-separation) | `[examples/audio-separation.ts](examples/audio-separation.ts)` |
+| Stories                   | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#stories)          | `[examples/story.ts](examples/story.ts)`                       |
+| Custom provider (Baseten) | [Guide](https://docs.camb.ai/sdk-guides/typescript-sdk#custom-provider)  | `[examples/baseten-provider.ts](examples/baseten-provider.ts)` |
+
 
 Self-hosted MARS deployments are covered in [Custom Cloud Providers](https://docs.camb.ai/custom-cloud-providers).
-
 
 ## Links
 

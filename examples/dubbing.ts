@@ -9,7 +9,7 @@ const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms
 async function testDubbing(): Promise<void> {
   console.log("Creating dubbing task...");
   const response = await client.dub.endToEndDubbing({
-    video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", // Replace with your video URL
+    video_url: "https://www.youtube.com/watch?v=.....", // Replace with your video URL
     source_language: CambApi.Languages.EN_US,
     target_language: CambApi.Languages.HI_IN,
   });
