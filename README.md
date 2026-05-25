@@ -20,6 +20,7 @@ The official TypeScript SDK for interacting with Camb AI's powerful voice and au
 - **Expressive Text-to-Speech**: Convert text into natural-sounding speech using a wide range of pre-existing voices.
 - **Generative Voices**: Create entirely new, unique voices from text prompts and descriptions.
 - **Soundscapes from Text**: Generate ambient audio and sound effects from textual descriptions.
+- **Live Transcription**: Stream microphone (browser or Node) or file audio over a WebSocket and receive cumulative interim transcripts, word-level timing, and typed events.
 - Access to voice cloning, translation, and more (refer to full API documentation).
 
 ## 📦 Installation
@@ -279,6 +280,63 @@ while (true) {
 }
 ```
 
+### 5. Live Transcription (Streaming WebSocket)
+
+Stream audio over a single WebSocket and receive cumulative interim
+transcripts, word-level timing, and typed events. The session ships a
+microphone helper for both browser (`AudioWorklet`) and Node
+(`node-record-lpcm16`) environments, and the same `on(event)` dispatcher
+as the Python SDK.
+
+```typescript
+import { CambClient, Microphone, ServerMessageType } from "@camb-ai/sdk";
+
+const client = new CambClient({ apiKey: process.env.CAMB_API_KEY });
+
+const session = await client.liveTranscription.connect({
+  model: "boli-v5",
+  language: "en-us",
+  sampleRate: 16000,
+});
+
+session.on(ServerMessageType.Ready, () => console.log("Ready"));
+session.on(ServerMessageType.Results, (msg) => {
+  // Cumulative transcript: replace the previous interim rather than
+  // concatenating successive Results events.
+  process.stdout.write(`\r${msg.transcript}`);
+});
+session.on(ServerMessageType.Closed, (info) => {
+  console.log(`\nClosed: code=${info.code} reason=${info.reason}`);
+});
+
+// Node:
+const mic = Microphone.fromNode({ sampleRate: 16000 });
+await mic.start();
+await session.pipe(mic);
+
+// Browser:
+// const mic = await Microphone.fromBrowser({ sampleRate: 16000 });
+// await mic.start();
+// await session.pipe(mic);
+```
+
+Optional peer deps:
+
+```bash
+# Node header-based auth on the WebSocket upgrade
+npm install ws
+
+# Node microphone capture (requires the host `sox` binary)
+npm install node-record-lpcm16
+```
+
+Prefer streaming a file (no audio device dependency)? See
+[`examples/live-transcription-file.js`](examples/live-transcription-file.js).
+For the full event catalog (`Ready`, `Results`, `Final`, `Error`,
+`Closed`), configuration options, and extensibility notes, see the
+[Live Transcription tutorial](https://docs.camb.ai/tutorials/live-transcription-with-sdk)
+and [SDK guide](https://docs.camb.ai/sdk-guides/live-transcription).
+
 ## ⚙️ Advanced Usage & Other Features
 
 The Camb AI SDK offers a wide range of capabilities beyond these examples, including:
@@ -286,7 +344,8 @@ The Camb AI SDK offers a wide range of capabilities beyond these examples, inclu
 - Voice Cloning
 - Translated TTS
 - Audio Dubbing
-- Transcription
+- Transcription (async file/URL jobs)
+- Live Transcription (streaming WebSocket — see Example 5 above)
 - And more!
 
 Please refer to the [Official Camb AI API Documentation](https://docs.camb.ai) for a comprehensive list of features and advanced usage patterns.
@@ -318,6 +377,8 @@ Check out the `examples/` directory for complete, runnable examples:
 - `text-to-audio.js` - Sound generation example
 - `dubbing.js` - Video dubbing workflow
 - `baseten-provider.js` - Using custom hosting providers
+- `live-transcription-microphone.js` - Stream microphone audio over the WebSocket (uses `node-record-lpcm16`)
+- `live-transcription-file.js` - Stream a local WAV at real-time pace (no audio device required)
 
 ## 🔗 Links
 
