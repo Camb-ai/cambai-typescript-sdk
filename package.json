@@ -44,7 +44,8 @@
     "@types/node": "^20.10.0"
   },
   "optionalDependencies": {
-    "node-record-lpcm16": "^1.0.1"
+    "node-record-lpcm16": "^1.0.1",
+    "ws": "^8.16.0"
   },
   "engines": {
     "node": ">=18.0.0"

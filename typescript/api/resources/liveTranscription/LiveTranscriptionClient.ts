@@ -71,10 +71,12 @@ export class LiveTranscriptionClient {
         const transport = this.options.transport
             ? this.options.transport()
             : new WebSocketTransport();
-        await transport.connect(url, headers);
 
+        // Attach the session's handlers BEFORE the transport connects so
+        // immediate post-handshake frames (e.g. Ready) are not dropped.
         const session = new LiveTranscriptionSession(transport);
         await session._attach();
+        await transport.connect(url, headers);
         return session;
     }
 }

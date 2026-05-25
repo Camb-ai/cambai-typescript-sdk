@@ -28,24 +28,83 @@ export class WebSocketTransport implements Transport {
     private readonly onErrorHandlers: Array<(err: Error) => void> = [];
 
     async connect(url: string, headers: Record<string, string>): Promise<void> {
-        const WS: typeof WebSocket | undefined = (globalThis as any).WebSocket;
-        if (!WS) {
-            throw new LiveTranscriptionConnectError(
-                "Global WebSocket is unavailable. Requires Node 18+ or a browser environment.",
-            );
-        }
-        // Node's WebSocket implementation accepts headers via a non-standard
-        // `headers` option in the third arg; browsers ignore it. The Node
-        // global accepts both ways depending on version.
-        const optionsArg: any = { headers };
-        try {
-            // Some platforms expose a 3-arg constructor that ignores extras.
-            this.ws = new (WS as any)(url, undefined, optionsArg) as WebSocket;
-        } catch {
-            this.ws = new WS(url);
+        const isBrowser =
+            typeof globalThis !== "undefined" &&
+            typeof (globalThis as any).window !== "undefined";
+
+        // Browsers cannot set custom headers on a WebSocket upgrade. Use the
+        // platform WebSocket directly; the session falls back to a query
+        // string for auth.
+        if (isBrowser) {
+            const WSCtor: typeof WebSocket | undefined = (globalThis as any).WebSocket;
+            if (!WSCtor) {
+                throw new LiveTranscriptionConnectError(
+                    "Global WebSocket is unavailable in this browser environment.",
+                );
+            }
+            this.ws = new WSCtor(url);
+        } else {
+            // Node: the built-in `WebSocket` global (Node 22+) does not accept
+            // custom headers on the upgrade, which the server requires for
+            // `x-api-key`. Prefer the `ws` package if installed; users who
+            // skip it (e.g. browser-only bundles) still get a usable client.
+            let WsLib: any;
+            try {
+                WsLib = (await import("ws" as any)).default ?? (await import("ws" as any));
+            } catch {
+                throw new LiveTranscriptionConnectError(
+                    "On Node the `ws` package is required for header-based auth. " +
+                        "Install it: npm install ws",
+                );
+            }
+            this.ws = new WsLib(url, { headers }) as unknown as WebSocket;
         }
 
-        this.ws.binaryType = "arraybuffer";
+        (this.ws as any).binaryType = "arraybuffer";
+
+        // IMPORTANT: attach data listeners BEFORE awaiting `open`. With the
+        // `ws` package, frames arriving immediately after the handshake are
+        // dropped if no listener is registered.
+        this.addListener("message", (data: any) => {
+            // `ws` emits Buffer for binary or string for text. The browser API
+            // wraps payloads in a MessageEvent under `.data`. Normalize both.
+            const raw = data?.data !== undefined ? data.data : data;
+            let payload: string | ArrayBuffer;
+            if (typeof raw === "string") {
+                payload = raw;
+            } else if (raw instanceof ArrayBuffer) {
+                payload = raw;
+            } else if (raw && typeof raw === "object" && typeof raw.byteLength === "number") {
+                // Buffer / Uint8Array from `ws` — surface to handlers as string
+                // because the server's frames are JSON; binary frames are not
+                // used by this protocol.
+                payload = Buffer.isBuffer?.(raw) ? raw.toString("utf8") : String(raw);
+            } else {
+                payload = String(raw);
+            }
+            for (const handler of this.onMessageHandlers) {
+                handler(payload);
+            }
+        });
+        this.addListener("close", (codeOrEvent: any, reason?: any) => {
+            const code = typeof codeOrEvent === "number" ? codeOrEvent : codeOrEvent?.code ?? 1006;
+            const rawReason = typeof reason === "string" || (reason && reason.length !== undefined) ? reason : codeOrEvent?.reason;
+            const r =
+                typeof rawReason === "string"
+                    ? rawReason
+                    : rawReason && typeof rawReason.toString === "function"
+                      ? rawReason.toString()
+                      : "";
+            for (const handler of this.onCloseHandlers) {
+                handler(code, r);
+            }
+        });
+        this.addListener("error", (event: any) => {
+            const err = new Error(String(event?.message ?? "WebSocket error"));
+            for (const handler of this.onErrorHandlers) {
+                handler(err);
+            }
+        });
 
         await new Promise<void>((resolve, reject) => {
             if (!this.ws) {
@@ -53,35 +112,43 @@ export class WebSocketTransport implements Transport {
                 return;
             }
             const onOpen = () => {
-                this.ws?.removeEventListener("open", onOpen);
-                this.ws?.removeEventListener("error", onErrorOnce);
+                this.removeListener("open", onOpen);
+                this.removeListener("error", onErrorOnce);
                 resolve();
             };
-            const onErrorOnce = (event: Event) => {
-                this.ws?.removeEventListener("open", onOpen);
-                this.ws?.removeEventListener("error", onErrorOnce);
-                reject(new LiveTranscriptionConnectError(`WebSocket connect failed: ${String((event as any)?.message ?? event?.type ?? "error")}`));
+            const onErrorOnce = (event: any) => {
+                this.removeListener("open", onOpen);
+                this.removeListener("error", onErrorOnce);
+                reject(
+                    new LiveTranscriptionConnectError(
+                        `WebSocket connect failed: ${String(event?.message ?? event?.type ?? event ?? "error")}`,
+                    ),
+                );
             };
-            this.ws.addEventListener("open", onOpen);
-            this.ws.addEventListener("error", onErrorOnce);
+            this.addListener("open", onOpen);
+            this.addListener("error", onErrorOnce);
         });
+    }
 
-        this.ws.addEventListener("message", (event: MessageEvent) => {
-            for (const handler of this.onMessageHandlers) {
-                handler(event.data as string | ArrayBuffer);
-            }
-        });
-        this.ws.addEventListener("close", (event: CloseEvent) => {
-            for (const handler of this.onCloseHandlers) {
-                handler(event.code, event.reason ?? "");
-            }
-        });
-        this.ws.addEventListener("error", (event: Event) => {
-            const err = new Error(String((event as any)?.message ?? "WebSocket error"));
-            for (const handler of this.onErrorHandlers) {
-                handler(err);
-            }
-        });
+    /** Unified event subscribe for both `ws` (Node) and the browser API. */
+    private addListener(event: string, fn: (...args: any[]) => void): void {
+        const target: any = this.ws;
+        if (!target) return;
+        if (typeof target.on === "function") {
+            target.on(event, fn);
+        } else if (typeof target.addEventListener === "function") {
+            target.addEventListener(event, fn as any);
+        }
+    }
+
+    private removeListener(event: string, fn: (...args: any[]) => void): void {
+        const target: any = this.ws;
+        if (!target) return;
+        if (typeof target.off === "function") {
+            target.off(event, fn);
+        } else if (typeof target.removeEventListener === "function") {
+            target.removeEventListener(event, fn as any);
+        }
     }
 
     async sendBytes(data: ArrayBuffer | Uint8Array): Promise<void> {

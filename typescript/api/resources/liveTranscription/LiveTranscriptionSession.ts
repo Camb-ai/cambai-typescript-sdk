@@ -26,14 +26,18 @@ export class LiveTranscriptionSession {
     private _isReady = false;
     private _isClosed = false;
     private _readyResolve?: () => void;
+    private _readyReject?: (err: Error) => void;
     private readonly readyPromise: Promise<void>;
     private closedResolve?: () => void;
     private readonly closedPromise: Promise<void>;
 
     constructor(private readonly transport: Transport) {
-        this.readyPromise = new Promise<void>((resolve) => {
+        this.readyPromise = new Promise<void>((resolve, reject) => {
             this._readyResolve = resolve;
+            this._readyReject = reject;
         });
+        // Avoid an unhandled-rejection warning if the user never awaits Ready.
+        this.readyPromise.catch(() => undefined);
         this.closedPromise = new Promise<void>((resolve) => {
             this.closedResolve = resolve;
         });
@@ -173,6 +177,11 @@ export class LiveTranscriptionSession {
     private emitClose(code: number, reason: string): void {
         if (this._isClosed) return;
         this._isClosed = true;
+        if (!this._isReady) {
+            this._readyReject?.(
+                new Error(`Session closed before Ready: code=${code} reason=${reason}`),
+            );
+        }
         this.dispatch(ServerMessageType.Closed, {
             type: ServerMessageType.Closed,
             code,
