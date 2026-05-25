@@ -3,6 +3,7 @@
 import { AudioSeparationClient } from "./api/resources/audioSeparation/client/Client.js";
 import { DeprecatedStreamingClient } from "./api/resources/deprecatedStreaming/client/Client.js";
 import { DictionariesClient } from "./api/resources/dictionaries/client/Client.js";
+import { LiveTranscriptionClient } from "./api/resources/liveTranscription/LiveTranscriptionClient.js";
 import { DubClient } from "./api/resources/dub/client/Client.js";
 import { FoldersClient } from "./api/resources/folders/client/Client.js";
 import { LanguagesClient } from "./api/resources/languages/client/Client.js";
@@ -50,6 +51,7 @@ export class CambClient {
     protected _dictionaries: DictionariesClient | undefined;
     protected _projectSetup: ProjectSetupClient | undefined;
     protected _deprecatedStreaming: DeprecatedStreamingClient | undefined;
+    protected _liveTranscription: LiveTranscriptionClient | undefined;
 
     constructor(options: CambClient.Options) {
         this._options = normalizeClientOptionsWithAuth(options);
@@ -121,6 +123,19 @@ export class CambClient {
 
     public get deprecatedStreaming(): DeprecatedStreamingClient {
         return (this._deprecatedStreaming ??= new DeprecatedStreamingClient(this._options));
+    }
+
+    public get liveTranscription(): LiveTranscriptionClient {
+        return (this._liveTranscription ??= new LiveTranscriptionClient({
+            apiKey: (this._options as any).apiKey,
+            environment: this._options.environment,
+            baseUrl: this._options.baseUrl,
+            headers: Object.fromEntries(
+                Object.entries(this._options.headers ?? {}).filter(
+                    ([, v]) => typeof v === "string",
+                ) as [string, string][],
+            ),
+        }));
     }
 
     public getSwaggerDocsDocsGet(requestOptions?: CambClient.RequestOptions): core.HttpResponsePromise<unknown> {
