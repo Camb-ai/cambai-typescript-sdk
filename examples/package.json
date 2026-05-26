@@ -5,6 +5,8 @@
     "description": "Examples for Camb.ai Node.js SDK",
     "private": true,
     "dependencies": {
-        "@camb-ai/sdk": "file:.."
+        "@camb-ai/sdk": "file:..",
+        "node-record-lpcm16": "^1.0.1",
+        "ws": "^8.16.0"
     }
 }
