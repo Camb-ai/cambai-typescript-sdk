@@ -15,5 +15,8 @@ export {
     Microphone,
     MicrophoneUnavailableError,
     ServerMessageType,
+    bindTranscriptPrinter,
+    createTranscriptPrinter,
+    type TranscriptPrinter,
 } from "./api/resources/liveTranscription/index.js";
 export { saveStreamToFile } from "./utils.js";

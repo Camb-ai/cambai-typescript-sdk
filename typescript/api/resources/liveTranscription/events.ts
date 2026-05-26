@@ -150,7 +150,7 @@ export const PARSER_REGISTRY: {
     [ServerMessageType.Error]: (raw: any) => ({
         type: ServerMessageType.Error,
         code: raw?.code,
-        message: raw?.message ?? "Unknown server error",
+        message: raw?.message ?? raw?.description ?? "Unknown server error",
         raw,
     }),
     [ServerMessageType.Closed]: (raw: any) => ({

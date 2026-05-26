@@ -1,5 +1,32 @@
 import { LiveTranscriptionConnectError } from "./errors.js";
 
+function decodeMessagePayload(raw: unknown): string | ArrayBuffer {
+    if (typeof raw === "string") {
+        return raw;
+    }
+    if (raw instanceof ArrayBuffer) {
+        return decodeUtf8(raw);
+    }
+    if (raw && typeof raw === "object" && typeof (raw as ArrayBufferView).byteLength === "number") {
+        // With `binaryType = "arraybuffer"`, the `ws` package delivers text
+        // frames as Uint8Array. `String(uint8array)` yields comma-separated
+        // byte codes, not JSON — decode as UTF-8 instead.
+        return decodeUtf8(raw as ArrayBufferView);
+    }
+    return String(raw);
+}
+
+function decodeUtf8(raw: ArrayBuffer | ArrayBufferView): string {
+    if (typeof TextDecoder !== "undefined") {
+        return new TextDecoder().decode(raw);
+    }
+    const view =
+        raw instanceof ArrayBuffer
+            ? new Uint8Array(raw)
+            : new Uint8Array(raw.buffer, raw.byteOffset, raw.byteLength);
+    return Buffer.from(view).toString("utf8");
+}
+
 export interface Transport {
     connect(url: string, headers: Record<string, string>): Promise<void>;
     sendBytes(data: ArrayBuffer | Uint8Array): Promise<void>;
@@ -69,19 +96,7 @@ export class WebSocketTransport implements Transport {
             // `ws` emits Buffer for binary or string for text. The browser API
             // wraps payloads in a MessageEvent under `.data`. Normalize both.
             const raw = data?.data !== undefined ? data.data : data;
-            let payload: string | ArrayBuffer;
-            if (typeof raw === "string") {
-                payload = raw;
-            } else if (raw instanceof ArrayBuffer) {
-                payload = raw;
-            } else if (raw && typeof raw === "object" && typeof raw.byteLength === "number") {
-                // Buffer / Uint8Array from `ws` — surface to handlers as string
-                // because the server's frames are JSON; binary frames are not
-                // used by this protocol.
-                payload = Buffer.isBuffer?.(raw) ? raw.toString("utf8") : String(raw);
-            } else {
-                payload = String(raw);
-            }
+            const payload = decodeMessagePayload(raw);
             for (const handler of this.onMessageHandlers) {
                 handler(payload);
             }

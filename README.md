@@ -289,7 +289,7 @@ microphone helper for both browser (`AudioWorklet`) and Node
 as the Python SDK.
 
 ```typescript
-import { CambClient, Microphone, ServerMessageType } from "@camb-ai/sdk";
+import { CambClient, Microphone, ServerMessageType, bindTranscriptPrinter } from "@camb-ai/sdk";
 
 const client = new CambClient({ apiKey: process.env.CAMB_API_KEY });
 
@@ -300,14 +300,15 @@ const session = await client.liveTranscription.connect({
 });
 
 session.on(ServerMessageType.Ready, () => console.log("Ready"));
-session.on(ServerMessageType.Results, (msg) => {
-  // Cumulative transcript: replace the previous interim rather than
-  // concatenating successive Results events.
-  process.stdout.write(`\r${msg.transcript}`);
-});
+
+const printer = bindTranscriptPrinter(session);
+
 session.on(ServerMessageType.Closed, (info) => {
-  console.log(`\nClosed: code=${info.code} reason=${info.reason}`);
+  printer.newline();
+  console.log(`Closed: code=${info.code} reason=${info.reason}`);
 });
+
+await session.waitUntilReady();
 
 // Node:
 const mic = Microphone.fromNode({ sampleRate: 16000 });

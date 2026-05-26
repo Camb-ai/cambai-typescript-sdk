@@ -12,7 +12,13 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { CambClient, ServerMessageType } from "@camb-ai/sdk";
+import { CambClient, ServerMessageType, bindTranscriptPrinter } from "@camb-ai/sdk";
+
+const apiKey = process.env.CAMB_API_KEY;
+if (!apiKey) {
+    console.error("Missing CAMB_API_KEY environment variable.");
+    process.exit(1);
+}
 
 function readWavHeader(buf) {
     let offset = 12;
@@ -49,7 +55,7 @@ async function main() {
     const { sampleRate, channels, bitsPerSample, pcm } = readWavHeader(fs.readFileSync(file));
     console.log(`Streaming ${path.basename(file)} (${sampleRate} Hz, ${channels} ch)`);
 
-    const client = new CambClient({ apiKey: process.env.CAMB_API_KEY });
+    const client = new CambClient({ apiKey });
     const session = await client.liveTranscription.connect({
         model: "boli-v5",
         language: "en-us",
@@ -59,9 +65,17 @@ async function main() {
     });
 
     session.on(ServerMessageType.Ready, () => console.log("[Ready]"));
-    session.on(ServerMessageType.Results, (msg) => process.stdout.write(`\r${msg.transcript}`));
-    session.on(ServerMessageType.Error, (err) => console.error(`\n[error] ${err.code}: ${err.message}`));
-    session.on(ServerMessageType.Closed, (info) => console.log(`\nClosed: code=${info.code} reason=${info.reason}`));
+
+    const printer = bindTranscriptPrinter(session);
+
+    session.on(ServerMessageType.Error, (err) => {
+        printer.newline();
+        console.error(`[error] ${err.code}: ${err.message}`);
+    });
+    session.on(ServerMessageType.Closed, (info) => {
+        printer.newline();
+        console.log(`Closed: code=${info.code} reason=${info.reason}`);
+    });
 
     await session.waitUntilReady();
 

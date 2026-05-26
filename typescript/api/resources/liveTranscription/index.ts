@@ -33,4 +33,9 @@ export {
     LiveTranscriptionClientOptions,
 } from "./LiveTranscriptionClient.js";
 export { LiveTranscriptionSession } from "./LiveTranscriptionSession.js";
+export {
+    bindTranscriptPrinter,
+    createTranscriptPrinter,
+    type TranscriptPrinter,
+} from "./TranscriptPrinter.js";
 export { Transport, WebSocketTransport } from "./Transport.js";

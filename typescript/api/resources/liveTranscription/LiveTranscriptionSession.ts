@@ -112,6 +112,7 @@ export class LiveTranscriptionSession {
     async sendAudio(chunk: ArrayBuffer | Uint8Array | Buffer): Promise<void> {
         const view: ArrayBuffer | Uint8Array =
             chunk instanceof ArrayBuffer ? chunk : (chunk as Uint8Array);
+        if (view.byteLength === 0) return;
         await this.transport.sendBytes(view);
     }
 

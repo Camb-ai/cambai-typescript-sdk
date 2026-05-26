@@ -192,17 +192,23 @@ export class NodeMicrophone implements AudioSource {
     constructor(private readonly opts: NodeMicrophoneOptions) {}
 
     async start(): Promise<void> {
-        let recorder: any;
+        let recordFn: ((options: object) => unknown) | undefined;
         try {
             // Dynamic import so users without the optional dep can still
             // import the rest of the SDK.
-            recorder = await import("node-record-lpcm16" as any);
+            const mod: any = await import("node-record-lpcm16" as any);
+            recordFn = mod.default?.record ?? mod.record;
         } catch (err) {
             throw new MicrophoneUnavailableError(
                 "Install 'node-record-lpcm16' (and the host's sox binary) to use Microphone.fromNode.",
             );
         }
-        this.recording = recorder.record({
+        if (typeof recordFn !== "function") {
+            throw new MicrophoneUnavailableError(
+                "Could not load 'node-record-lpcm16'; reinstall the package.",
+            );
+        }
+        this.recording = recordFn({
             sampleRate: this.opts.sampleRate ?? 16000,
             channels: 1,
             audioType: "raw",
@@ -210,6 +216,7 @@ export class NodeMicrophone implements AudioSource {
         });
         const stream = this.recording.stream();
         stream.on("data", (chunk: Buffer) => {
+            if (chunk.length === 0) return;
             const buf = new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.byteLength);
             if (this.waiter) {
                 const w = this.waiter;
