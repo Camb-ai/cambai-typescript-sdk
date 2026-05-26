@@ -4,6 +4,7 @@ import { AudioSeparationClient } from "./api/resources/audioSeparation/client/Cl
 import { DeprecatedStreamingClient } from "./api/resources/deprecatedStreaming/client/Client.js";
 import { DictionariesClient } from "./api/resources/dictionaries/client/Client.js";
 import { LiveTranscriptionClient } from "./api/resources/liveTranscription/LiveTranscriptionClient.js";
+import { RealtimeClient } from "./api/resources/realtime/RealtimeClient.js";
 import { DubClient } from "./api/resources/dub/client/Client.js";
 import { FoldersClient } from "./api/resources/folders/client/Client.js";
 import { LanguagesClient } from "./api/resources/languages/client/Client.js";
@@ -52,6 +53,7 @@ export class CambClient {
     protected _projectSetup: ProjectSetupClient | undefined;
     protected _deprecatedStreaming: DeprecatedStreamingClient | undefined;
     protected _liveTranscription: LiveTranscriptionClient | undefined;
+    protected _realtime: RealtimeClient | undefined;
 
     constructor(options: CambClient.Options) {
         this._options = normalizeClientOptionsWithAuth(options);
@@ -130,6 +132,17 @@ export class CambClient {
             apiKey: (this._options as any).apiKey,
             environment: this._options.environment,
             baseUrl: this._options.baseUrl,
+            headers: Object.fromEntries(
+                Object.entries(this._options.headers ?? {}).filter(
+                    ([, v]) => typeof v === "string",
+                ) as [string, string][],
+            ),
+        }));
+    }
+
+    public get realtime(): RealtimeClient {
+        return (this._realtime ??= new RealtimeClient({
+            apiKey: (this._options as any).apiKey,
             headers: Object.fromEntries(
                 Object.entries(this._options.headers ?? {}).filter(
                     ([, v]) => typeof v === "string",

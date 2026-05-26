@@ -19,4 +19,15 @@ export {
     createTranscriptPrinter,
     type TranscriptPrinter,
 } from "./api/resources/liveTranscription/index.js";
+export * as Realtime from "./api/resources/realtime/index.js";
+export {
+    OutputModality as RealtimeOutputModality,
+    RealtimeClient,
+    RealtimeConnectError,
+    RealtimeError,
+    RealtimeModel,
+    RealtimeProtocolError,
+    RealtimeSession,
+    ServerEventType as RealtimeServerEventType,
+} from "./api/resources/realtime/index.js";
 export { saveStreamToFile } from "./utils.js";
