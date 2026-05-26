@@ -12,7 +12,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { CambClient, ServerMessageType, bindTranscriptPrinter } from "@camb-ai/sdk";
+import { CambClient, LiveTranscriptionEncoding, ServerMessageType, bindTranscriptPrinter } from "@camb-ai/sdk";
 
 const apiKey = process.env.CAMB_API_KEY;
 if (!apiKey) {
@@ -59,7 +59,7 @@ async function main() {
     const session = await client.liveTranscription.connect({
         model: "boli-v5",
         language: "en-us",
-        encoding: "linear16",
+        encoding: LiveTranscriptionEncoding.Linear16,
         sampleRate,
         channels,
     });
