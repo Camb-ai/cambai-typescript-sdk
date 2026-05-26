@@ -43,8 +43,15 @@ export class LiveTranscriptionSession {
         });
     }
 
+    private attached = false;
+
     /** @internal — called by `LiveTranscriptionClient.connect`. */
     async _attach(): Promise<void> {
+        // Idempotent: each transport listener slot in our Transport is a
+        // push-list, so re-running _attach would register a second copy of
+        // every handler and every server frame would dispatch twice.
+        if (this.attached) return;
+        this.attached = true;
         this.transport.onMessage((data) => this.handleFrame(data));
         this.transport.onClose((code, reason) => this.emitClose(code, reason));
         this.transport.onError(() => {
