@@ -31,3 +31,16 @@ export {
     ServerEventType as RealtimeServerEventType,
 } from "./api/resources/realtime/index.js";
 export { saveStreamToFile } from "./utils.js";
+export {
+    SoxRequiredError,
+    assertSoxAvailable,
+    assertSoxMicAvailable,
+    assertSoxPlaybackAvailable,
+    createSoxPcmSpeaker,
+    createSoxPcmSpeakerChecked,
+    getSoxInstallInstructions,
+    isSoxAvailable,
+    isSoxPlayAvailable,
+    type CreateSoxPcmSpeakerOptions,
+    type SoxPcmSpeaker,
+} from "./sox.js";

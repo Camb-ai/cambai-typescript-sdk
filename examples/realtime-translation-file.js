@@ -1,9 +1,8 @@
 // Realtime speech-to-speech translation from a WAV file.
 //
 // Streams a local WAV at real-time pace, prints the transcript and translated
-// text, and writes the translated audio to an output WAV. Useful on machines
-// with no microphone or speaker (CI, servers) to exercise the realtime
-// pipeline end to end.
+// text, and writes the translated audio to an output WAV. Pass `--play` to
+// hear translated audio through your speakers as it arrives (requires SoX).
 //
 // The input WAV must be 16-bit PCM, mono, 24 kHz (the rate the realtime
 // endpoint expects). Output is written at the same format.
@@ -11,11 +10,19 @@
 // Run with:
 //   export CAMB_API_KEY=...
 //   node examples/realtime-translation-file.js input_24k_mono.wav [out.wav] [en-us] [de-de]
+//   node examples/realtime-translation-file.js --play input_24k_mono.wav
 
 import fs from "node:fs";
 import path from "node:path";
 
-import { CambClient, RealtimeServerEventType } from "@camb-ai/sdk";
+import {
+    CambClient,
+    RealtimeModel,
+    RealtimeServerEventType,
+    SoxRequiredError,
+    assertSoxPlaybackAvailable,
+    createSoxPcmSpeaker,
+} from "@camb-ai/sdk";
 
 const SAMPLE_RATE = 24000; // PCM16 mono
 
@@ -72,14 +79,32 @@ function writeWav(outPath, pcm, sampleRate) {
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function main() {
-    const inPath = process.argv[2];
+    const args = process.argv.slice(2);
+    const playAudio = args.includes("--play");
+    const positional = args.filter((arg) => arg !== "--play");
+
+    const inPath = positional[0];
     if (!inPath) {
-        console.error("usage: node examples/realtime-translation-file.js INPUT.wav [OUT.wav] [SRC] [TGT]");
+        console.error(
+            "usage: node examples/realtime-translation-file.js [--play] INPUT.wav [OUT.wav] [SRC] [TGT]",
+        );
         process.exit(2);
     }
-    const outPath = process.argv[3] ?? "translated_output.wav";
-    const sourceLanguage = process.argv[4] ?? "en-us";
-    const targetLanguage = process.argv[5] ?? "de-de";
+    const outPath = positional[1] ?? "translated_output.wav";
+    const sourceLanguage = positional[2] ?? "en-us";
+    const targetLanguage = positional[3] ?? "de-de";
+
+    if (playAudio) {
+        try {
+            await assertSoxPlaybackAvailable();
+        } catch (err) {
+            if (err instanceof SoxRequiredError) {
+                console.error(err.message);
+                process.exit(1);
+            }
+            throw err;
+        }
+    }
 
     const { sampleRate, channels, bitsPerSample, pcm } = readWavHeader(fs.readFileSync(inPath));
     if (sampleRate !== SAMPLE_RATE || channels !== 1 || bitsPerSample !== 16) {
@@ -94,9 +119,10 @@ async function main() {
         sourceLanguage,
         targetLanguage,
         // iris is the low-latency model (no cold-boot wait).
-        model: "iris",
+        model: RealtimeModel.Iris,
     });
 
+    const speaker = playAudio ? createSoxPcmSpeaker({ sampleRate: SAMPLE_RATE }) : null;
     const outChunks = [];
     let resolveDone;
     const audioDone = new Promise((r) => (resolveDone = r));
@@ -105,7 +131,10 @@ async function main() {
         console.log("Booting the translation pipeline (this can take 30s+)..."),
     );
     session.on(RealtimeServerEventType.SessionCreated, () =>
-        console.log(`Ready. Streaming ${path.basename(inPath)} (${sourceLanguage} -> ${targetLanguage})...`),
+        console.log(
+            `Ready. Streaming ${path.basename(inPath)} (${sourceLanguage} -> ${targetLanguage})` +
+                (playAudio ? " with speaker playback..." : "..."),
+        ),
     );
     session.on(RealtimeServerEventType.TranscriptCompleted, (event) =>
         console.log(`[you]         ${event.transcript}`),
@@ -113,7 +142,11 @@ async function main() {
     session.on(RealtimeServerEventType.TextDone, (event) =>
         console.log(`[translation] ${event.text}`),
     );
-    session.on(RealtimeServerEventType.AudioDelta, (event) => outChunks.push(Buffer.from(event.data)));
+    session.on(RealtimeServerEventType.AudioDelta, (event) => {
+        const chunk = Buffer.from(event.data);
+        outChunks.push(chunk);
+        speaker?.feed(chunk);
+    });
     session.on(RealtimeServerEventType.AudioDone, () => resolveDone());
     session.on(RealtimeServerEventType.Error, (err) =>
         console.error(`Server error: ${err.message}`),
@@ -138,6 +171,9 @@ async function main() {
     // audio before we close.
     await Promise.race([audioDone, sleep(30_000)]);
     await session.close();
+    if (speaker) {
+        await speaker.close();
+    }
 
     const audio = Buffer.concat(outChunks);
     if (audio.length > 0) {

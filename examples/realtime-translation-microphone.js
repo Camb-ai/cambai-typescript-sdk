@@ -6,16 +6,21 @@
 //
 // Requires:
 //   npm install @camb-ai/sdk node-record-lpcm16
-//   sox on the host (e.g. `brew install sox` on macOS) — used for both mic
-//   capture (node-record-lpcm16) and playback (the `play` command).
+//   sox on the host — checked at startup (mic capture + speaker playback)
 //
 // Run with:
 //   export CAMB_API_KEY=...
 //   node examples/realtime-translation-microphone.js [en-us] [de-de]
 
-import { spawn } from "node:child_process";
-
-import { CambClient, Microphone, RealtimeServerEventType } from "@camb-ai/sdk";
+import {
+    CambClient,
+    Microphone,
+    RealtimeModel,
+    RealtimeServerEventType,
+    SoxRequiredError,
+    assertSoxAvailable,
+    createSoxPcmSpeakerChecked,
+} from "@camb-ai/sdk";
 
 const SAMPLE_RATE = 24000; // PCM16 mono, both directions
 
@@ -25,32 +30,17 @@ if (!apiKey) {
     process.exit(1);
 }
 
-// Plays raw PCM16 mono bytes by piping them to sox's `play`, so no extra npm
-// dependency is needed beyond the sox binary the mic capture already requires.
-function createSpeaker() {
-    const proc = spawn(
-        "play",
-        ["-q", "-t", "raw", "-r", String(SAMPLE_RATE), "-e", "signed", "-b", "16", "-c", "1", "-"],
-        { stdio: ["pipe", "ignore", "ignore"] },
-    );
-    proc.on("error", () =>
-        console.error("Could not start playback (`play` from sox not found). Install sox to hear audio."),
-    );
-    return {
-        feed(buf) {
-            if (proc.stdin.writable) proc.stdin.write(buf);
-        },
-        close() {
-            try {
-                proc.stdin.end();
-            } catch {
-                // ignore
-            }
-        },
-    };
-}
-
 async function main() {
+    try {
+        await assertSoxAvailable({ playback: true });
+    } catch (err) {
+        if (err instanceof SoxRequiredError) {
+            console.error(err.message);
+            process.exit(1);
+        }
+        throw err;
+    }
+
     const sourceLanguage = process.argv[2] ?? "en-us";
     const targetLanguage = process.argv[3] ?? "de-de";
 
@@ -59,10 +49,10 @@ async function main() {
         sourceLanguage,
         targetLanguage,
         // iris is the low-latency model (no cold-boot wait).
-        model: "iris",
+        model: RealtimeModel.Iris,
     });
 
-    const speaker = createSpeaker();
+    const speaker = await createSoxPcmSpeakerChecked({ sampleRate: SAMPLE_RATE });
 
     session.on(RealtimeServerEventType.SessionStarting, () =>
         console.log("Booting the translation pipeline (this can take 30s+)..."),
@@ -91,13 +81,13 @@ async function main() {
 
     process.on("SIGINT", async () => {
         await mic.stop();
-        speaker.close();
+        await speaker.close();
         await session.close();
         process.exit(0);
     });
 
     await session.stream(mic);
-    speaker.close();
+    await speaker.close();
 }
 
 main().catch((err) => {
