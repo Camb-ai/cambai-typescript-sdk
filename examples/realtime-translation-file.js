@@ -17,7 +17,6 @@ import path from "node:path";
 
 import {
     CambClient,
-    RealtimeModel,
     RealtimeServerEventType,
     SoxRequiredError,
     assertSoxPlaybackAvailable,
@@ -118,8 +117,6 @@ async function main() {
     const session = await client.realtime.connect({
         sourceLanguage,
         targetLanguage,
-        // iris is the low-latency model (no cold-boot wait).
-        model: RealtimeModel.Iris,
     });
 
     const speaker = playAudio ? createSoxPcmSpeaker({ sampleRate: SAMPLE_RATE }) : null;
