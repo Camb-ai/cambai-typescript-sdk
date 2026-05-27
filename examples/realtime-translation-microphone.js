@@ -58,8 +58,6 @@ async function main() {
     const session = await client.realtime.connect({
         sourceLanguage,
         targetLanguage,
-        // iris is the low-latency model (no cold-boot wait).
-        model: "iris",
     });
 
     const speaker = createSpeaker();

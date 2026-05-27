@@ -35,7 +35,7 @@ export interface ResolvedConnectOptions {
     outputModalities: OutputModality[];
 }
 
-export const DEFAULT_MODEL: RealtimeModel = RealtimeModel.Lilac;
+export const DEFAULT_MODEL: RealtimeModel = RealtimeModel.Iris;
 export const DEFAULT_OUTPUT_MODALITIES: OutputModality[] = [
     OutputModality.Text,
     OutputModality.Audio,
