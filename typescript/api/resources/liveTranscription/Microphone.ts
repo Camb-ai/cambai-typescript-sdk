@@ -1,6 +1,7 @@
 import type { AudioSource } from "./AudioSource.js";
 import { MicrophoneUnavailableError } from "./errors.js";
 import type { LiveTranscriptionSession } from "./LiveTranscriptionSession.js";
+import { assertSoxAvailable, SoxRequiredError } from "../../../sox.js";
 
 export interface BrowserMicrophoneOptions {
     sampleRate?: number;
@@ -192,6 +193,14 @@ export class NodeMicrophone implements AudioSource {
     constructor(private readonly opts: NodeMicrophoneOptions) {}
 
     async start(): Promise<void> {
+        try {
+            await assertSoxAvailable();
+        } catch (err) {
+            if (err instanceof SoxRequiredError) {
+                throw new MicrophoneUnavailableError(err.message);
+            }
+            throw err;
+        }
         let recordFn: ((options: object) => unknown) | undefined;
         try {
             // Dynamic import so users without the optional dep can still

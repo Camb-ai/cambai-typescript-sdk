@@ -2,13 +2,20 @@
 //
 // Requires:
 //   npm install ws node-record-lpcm16
-//   sox on the host (e.g. brew install sox on macOS)
+//   sox on the host — checked at startup (see SDK getSoxInstallInstructions())
 //
 // Run with:
 //   export CAMB_API_KEY=...
 //   node examples/live-transcription-microphone.js
 
-import { CambClient, Microphone, ServerMessageType, bindTranscriptPrinter } from "@camb-ai/sdk";
+import {
+    CambClient,
+    Microphone,
+    ServerMessageType,
+    SoxRequiredError,
+    assertSoxAvailable,
+    bindTranscriptPrinter,
+} from "@camb-ai/sdk";
 
 const apiKey = process.env.CAMB_API_KEY;
 if (!apiKey) {
@@ -17,6 +24,16 @@ if (!apiKey) {
 }
 
 async function main() {
+    try {
+        await assertSoxAvailable();
+    } catch (err) {
+        if (err instanceof SoxRequiredError) {
+            console.error(err.message);
+            process.exit(1);
+        }
+        throw err;
+    }
+
     const client = new CambClient({ apiKey });
 
     const session = await client.liveTranscription.connect({
