@@ -15,7 +15,6 @@
 import {
     CambClient,
     Microphone,
-    RealtimeModel,
     RealtimeServerEventType,
     SoxRequiredError,
     assertSoxAvailable,
@@ -48,8 +47,6 @@ async function main() {
     const session = await client.realtime.connect({
         sourceLanguage,
         targetLanguage,
-        // iris is the low-latency model (no cold-boot wait).
-        model: RealtimeModel.Iris,
     });
 
     const speaker = await createSoxPcmSpeakerChecked({ sampleRate: SAMPLE_RATE });

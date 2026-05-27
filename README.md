@@ -343,8 +343,7 @@ and [SDK guide](https://docs.camb.ai/sdk-guides/live-transcription).
 
 Speak (or stream a file) in one language and receive the translation as live
 text and synthesized speech over a single WebSocket. Audio is PCM16 mono at
-24 kHz in both directions. Use `iris` for low latency (no cold-boot wait);
-`lilac`, `violet`, and `orchid` cold-boot for ~30s+ on the first connection.
+24 kHz in both directions.
 
 ```typescript
 import { CambClient, Microphone, RealtimeServerEventType } from "@camb-ai/sdk";
@@ -354,7 +353,6 @@ const client = new CambClient({ apiKey: process.env.CAMB_API_KEY });
 const session = await client.realtime.connect({
   sourceLanguage: "en-us",
   targetLanguage: "de-de",
-  model: "iris", // low-latency; lilac/violet/orchid cold-boot ~30s+
 });
 
 session.on(RealtimeServerEventType.TextDone, (event) =>
