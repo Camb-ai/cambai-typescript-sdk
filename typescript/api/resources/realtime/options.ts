@@ -22,6 +22,15 @@ export interface ConnectOptions {
     sourceLanguage: string;
     targetLanguage: string;
     outputModalities?: OutputModality[];
+    /**
+     * Synthesize the translation with one of your cloned voices. Pass the ID
+     * of a voice you own (from `voices.list()` or a custom voice you created).
+     * When omitted, a built-in voice for `targetLanguage` is used.
+     *
+     * For the most natural-sounding results, choose a voice whose reference
+     * language matches `targetLanguage`.
+     */
+    voiceId?: number;
     /** Override the WebSocket base URL (e.g. for staging). */
     baseUrl?: string;
     /** Override the API key resolved from the parent client. */
@@ -33,6 +42,7 @@ export interface ResolvedConnectOptions {
     sourceLanguage: string;
     targetLanguage: string;
     outputModalities: OutputModality[];
+    voiceId?: number;
 }
 
 export const DEFAULT_MODEL: RealtimeModel = RealtimeModel.Iris;
@@ -47,6 +57,7 @@ export function resolveOptions(opts: ConnectOptions): ResolvedConnectOptions {
         sourceLanguage: opts.sourceLanguage,
         targetLanguage: opts.targetLanguage,
         outputModalities: opts.outputModalities ?? DEFAULT_OUTPUT_MODALITIES,
+        voiceId: opts.voiceId,
     };
 }
 
@@ -59,10 +70,14 @@ export function toQuery(opts: ResolvedConnectOptions): URLSearchParams {
 
 /** Body of the `session.update` message sent after the WS handshake. */
 export function toSessionPayload(opts: ResolvedConnectOptions): Record<string, unknown> {
-    return {
+    const session: Record<string, unknown> = {
         model: opts.model,
         source_language: opts.sourceLanguage,
         target_language: opts.targetLanguage,
         output_modalities: opts.outputModalities,
     };
+    if (opts.voiceId !== undefined) {
+        session.voice = { type: "cloned", voice_id: opts.voiceId };
+    }
+    return session;
 }
