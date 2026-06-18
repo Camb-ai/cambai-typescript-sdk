@@ -147,7 +147,7 @@ Convert text into spoken audio using one of Camb AI's high-quality voices.
 ```javascript
 const response = await client.textToSpeech.tts({
   text: "[warm, friendly] Great to meet you!",
-  voice_id: 20303,
+  voice_id: 147320,
   language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs,
   speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.MarsInstruct,
   user_instructions: "Speak warmly and with enthusiasm.",
