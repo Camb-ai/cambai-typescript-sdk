@@ -1,5 +1,4 @@
 import * as core from "../../../core/index.js";
-import { CambApiEnvironment } from "../../../environments.js";
 import { LiveTranscriptionConnectError } from "./errors.js";
 import { LiveTranscriptionSession } from "./LiveTranscriptionSession.js";
 import { ConnectOptions, resolveOptions, toQuery } from "./options.js";
@@ -13,6 +12,11 @@ export interface LiveTranscriptionClientOptions {
     /** Inject a transport (e.g. for tests). */
     transport?: () => Transport;
 }
+
+// Live transcription runs on the dedicated realtime host, independent of the
+// REST API environment. Mirrors realtime's DEFAULT_REALTIME_BASE_URL.
+export const DEFAULT_LIVE_TRANSCRIPTION_BASE_URL = "wss://realtime.camb.ai";
+const LIVE_TRANSCRIPTION_PATH = "/streaming-transcription/listen";
 
 function isBrowser(): boolean {
     return typeof globalThis !== "undefined" && typeof (globalThis as any).window !== "undefined";
@@ -47,7 +51,7 @@ export class LiveTranscriptionClient {
             (this.options.environment
                 ? await core.Supplier.get(this.options.environment)
                 : undefined) ??
-            CambApiEnvironment.Default;
+            DEFAULT_LIVE_TRANSCRIPTION_BASE_URL;
 
         const resolved = resolveOptions(opts);
         const query = toQuery(resolved);
@@ -66,7 +70,7 @@ export class LiveTranscriptionClient {
             headers["x-api-key"] = apiKey;
         }
 
-        const url = `${wsBase}/transcription/listen?${query.toString()}`;
+        const url = `${wsBase}${LIVE_TRANSCRIPTION_PATH}?${query.toString()}`;
 
         const transport = this.options.transport
             ? this.options.transport()
