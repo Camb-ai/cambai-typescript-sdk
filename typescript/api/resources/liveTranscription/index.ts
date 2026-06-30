@@ -29,6 +29,7 @@ export {
     NodeMicrophoneOptions,
 } from "./Microphone.js";
 export {
+    DEFAULT_LIVE_TRANSCRIPTION_BASE_URL,
     LiveTranscriptionClient,
     LiveTranscriptionClientOptions,
 } from "./LiveTranscriptionClient.js";
