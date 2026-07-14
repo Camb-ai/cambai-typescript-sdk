@@ -22,4 +22,6 @@ export interface EndToEndDubbingRequestPayload {
     add_output_as_an_audio_track?: boolean | null;
     chosen_dictionaries?: number[] | null;
     ai_optimization?: boolean | null;
+    /** Transcription mode: `fast` (default) or `slow` for a more thorough pass. */
+    transcription_mode?: "fast" | "slow" | null;
 }

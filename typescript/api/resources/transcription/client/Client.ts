@@ -80,6 +80,10 @@ export class TranscriptionClient {
             _request.append("folder_id", request.folder_id?.toString() ?? null);
         }
 
+        if (request.transcription_mode != null) {
+            _request.append("transcription_mode", request.transcription_mode);
+        }
+
         const _maybeEncodedRequest = await _request.getRequest();
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
