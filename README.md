@@ -258,6 +258,7 @@ const response = await client.dub.endToEndDubbing({
   video_url: "your_accessible_video_url",
   source_language: CambApi.Languages.EN_US, // Check client.languages.getSourceLanguages()
   target_language: CambApi.Languages.HI_IN, // Example target language
+  transcription_mode: "fast", // fast (default) or slow for a more thorough transcription pass
 });
 
 const taskId = response.task_id;

@@ -24,4 +24,6 @@ export interface BodyCreateTranscriptionTranscribePost {
     project_name?: string | null;
     project_description?: string | null;
     folder_id?: number | null;
+    /** Transcription mode: `fast` (default) or `slow` for a more thorough pass. */
+    transcription_mode?: "fast" | "slow" | null;
 }
