@@ -128,6 +128,33 @@ Convert text into spoken audio using one of Camb AI's high-quality voices.
 | **mars-instruct** | **22.05kHz** | Optimized for instruction-following and nuance control.                                      |
 | **mars-flash**    | **22.05kHz** | Low-latency model optimized for real-time applications and conversational AI.                |
 
+#### TTS request options
+
+`client.textToSpeech.tts(...)` accepts the core request fields plus optional controls for model behavior and output format:
+
+| Option | Description |
+| :--- | :--- |
+| `text` | Text to synthesize. For `mars-instruct`, you can include inline emotion or pacing tags. |
+| `language` | Locale such as `CambApi.CreateStreamTtsRequestPayload.Language.EnUs`. |
+| `voice_id` | Voice profile ID from `client.voiceCloning.listVoices()`. |
+| `speech_model` | Model to use, such as `Mars81FlashBeta`, `MarsPro`, or `MarsInstruct`. |
+| `user_instructions` | Adds style, tone, pronunciation, or delivery guidance for the request. Available only with `MarsInstruct`. |
+| `output_configuration` | Output settings such as `{ format: "wav" }`. |
+| `voice_settings` | Voice behavior controls such as speaking rate, reference enhancement, or accent preservation. |
+| `inference_options` | Advanced generation controls for supported models. |
+| `enhance_named_entities_pronunciation` | Improves pronunciation for names and other named entities when supported. |
+
+```javascript
+const response = await client.textToSpeech.tts({
+  text: "[warm, friendly] Great to meet you!",
+  voice_id: 147320,
+  language: CambApi.CreateStreamTtsRequestPayload.Language.EnUs,
+  speech_model: CambApi.CreateStreamTtsRequestPayload.SpeechModel.MarsInstruct,
+  user_instructions: "Speak warmly and with enthusiasm.",
+  output_configuration: { format: "wav" },
+});
+```
+
 #### a) Get Audio and Save to File
 
 ```javascript
