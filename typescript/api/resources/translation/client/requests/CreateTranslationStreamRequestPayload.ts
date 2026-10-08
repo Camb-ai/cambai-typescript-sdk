@@ -12,8 +12,8 @@ import type * as CambApi from "../../../../index.js";
  */
 export interface CreateTranslationStreamRequestPayload {
     traceparent?: string | null;
-    source_language: CambApi.Languages;
-    target_language: CambApi.Languages;
+    source_language: CambApi.Languages | string;
+    target_language: CambApi.Languages | string;
     text: string;
     formality?: CambApi.Formalities | null;
     gender?: CambApi.Gender | null;

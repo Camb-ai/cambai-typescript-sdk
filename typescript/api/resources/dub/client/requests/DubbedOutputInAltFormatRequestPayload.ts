@@ -12,7 +12,7 @@ import type * as CambApi from "../../../../index.js";
  */
 export interface DubbedOutputInAltFormatRequestPayload {
     run_id: number | null;
-    language: CambApi.Languages;
+    language: CambApi.Languages | string;
     output_format: DubbedOutputInAltFormatRequestPayload.OutputFormat;
 }
 
