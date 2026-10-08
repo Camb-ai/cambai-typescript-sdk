@@ -22,7 +22,7 @@ export interface CreateTranslatedTtsRequestPayload {
     age?: number | null;
     formality?: CambApi.Formalities | null;
     gender?: CambApi.Gender | null;
-    source_language: CambApi.Languages;
-    target_language: CambApi.Languages;
+    source_language: CambApi.Languages | string;
+    target_language: CambApi.Languages | string;
     chosen_dictionaries?: number[] | null;
 }

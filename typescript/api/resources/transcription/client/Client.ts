@@ -84,6 +84,10 @@ export class TranscriptionClient {
             _request.append("transcription_mode", request.transcription_mode);
         }
 
+        if (request.run_audio_cleaning != null) {
+            _request.append("run_audio_cleaning", request.run_audio_cleaning.toString());
+        }
+
         if (request.formatting_options != null) {
             _request.append(
                 "formatting_options",

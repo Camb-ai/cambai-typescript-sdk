@@ -11,8 +11,8 @@ import type * as CambApi from "../../../../index.js";
  */
 export interface BodyCreateTranscriptionTranscribePost {
     run_id?: number | null;
-    /** Signed URL to audio file for transcription */
-    language: CambApi.Languages;
+    /** Language ID, locale tag, or "auto" for language detection. */
+    language: CambApi.Languages | string;
     /** Media file for transcription */
     media_file?: core.file.Uploadable | undefined;
     /** Signed URL to media file for transcription */
@@ -26,5 +26,7 @@ export interface BodyCreateTranscriptionTranscribePost {
     folder_id?: number | null;
     /** Transcription mode: `fast` (default) or `slow` for a more thorough pass. */
     transcription_mode?: "fast" | "slow" | null;
+    /** Run source separation before transcription (default true). Set false for clean speech. */
+    run_audio_cleaning?: boolean;
     formatting_options?: CambApi.SubtitleFormattingOptions | string | null;
 }

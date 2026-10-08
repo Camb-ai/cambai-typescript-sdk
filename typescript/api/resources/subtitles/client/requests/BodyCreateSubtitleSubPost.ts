@@ -11,9 +11,9 @@ import type * as CambApi from "../../../../index.js";
  *     }
  */
 export interface BodyCreateSubtitleSubPost {
-    source_language: CambApi.Languages;
+    source_language: CambApi.Languages | string;
     media_url: string;
-    target_languages: CambApi.Languages[];
+    target_languages: (CambApi.Languages | string)[];
     project_name?: string | null;
     project_description?: string | null;
     folder_id?: number | null;
