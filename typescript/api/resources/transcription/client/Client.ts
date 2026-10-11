@@ -46,9 +46,6 @@ export class TranscriptionClient {
         requestOptions?: TranscriptionClient.RequestOptions,
     ): Promise<core.WithRawResponse<CambApi.OrchestratorPipelineCallResult>> {
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
-        if (request.run_id !== undefined) {
-            _queryParams.run_id = request.run_id?.toString() ?? null;
-        }
 
         const _request = await core.newFormData();
         _request.append("language", request.language.toString());
@@ -84,6 +81,10 @@ export class TranscriptionClient {
             _request.append("transcription_mode", request.transcription_mode);
         }
 
+        if (request.include_music_in_fg != null) {
+            _request.append("include_music_in_fg", request.include_music_in_fg.toString());
+        }
+
         if (request.run_audio_cleaning != null) {
             _request.append("run_audio_cleaning", request.run_audio_cleaning.toString());
         }
@@ -102,6 +103,7 @@ export class TranscriptionClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
+            mergeOnlyDefinedHeaders({ traceparent: request.traceparent ?? undefined }),
             mergeOnlyDefinedHeaders({ ..._maybeEncodedRequest.headers }),
             requestOptions?.headers,
         );
@@ -172,16 +174,14 @@ export class TranscriptionClient {
         request: CambApi.GetTranscriptionTaskStatusTranscribeTaskIdGetRequest,
         requestOptions?: TranscriptionClient.RequestOptions,
     ): Promise<core.WithRawResponse<CambApi.OrchestratorPipelineResult>> {
-        const { task_id: taskId, run_id: runId } = request;
+        const { task_id: taskId } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
-        if (runId !== undefined) {
-            _queryParams.run_id = runId?.toString() ?? null;
-        }
 
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
+            mergeOnlyDefinedHeaders({ traceparent: request.traceparent ?? undefined }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -250,14 +250,10 @@ export class TranscriptionClient {
     ): Promise<core.WithRawResponse<CambApi.TranscriptionResult | CambApi.TranscriptExportResult>> {
         const {
             run_id: runId,
-            word_level_timestamps: wordLevelTimestamps,
             format_type: formatType,
             data_type: dataType,
         } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
-        if (wordLevelTimestamps !== undefined) {
-            _queryParams.word_level_timestamps = wordLevelTimestamps?.toString() ?? null;
-        }
 
         if (formatType != null) {
             _queryParams.format_type = formatType;
@@ -271,6 +267,7 @@ export class TranscriptionClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
+            mergeOnlyDefinedHeaders({ traceparent: request.traceparent ?? undefined }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -344,17 +341,14 @@ export class TranscriptionClient {
         request: CambApi.GetTranscriptionResultsTranscriptionResultsPostRequest,
         requestOptions?: TranscriptionClient.RequestOptions,
     ): Promise<core.WithRawResponse<Record<string, CambApi.TranscriptionResult>>> {
-        const { run_id: runId, traceparent, body: _body } = request;
+        const { body: _body } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
-        if (runId !== undefined) {
-            _queryParams.run_id = runId?.toString() ?? null;
-        }
 
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ traceparent: traceparent !== undefined ? traceparent : undefined }),
+            mergeOnlyDefinedHeaders({ traceparent: request.traceparent ?? undefined }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({

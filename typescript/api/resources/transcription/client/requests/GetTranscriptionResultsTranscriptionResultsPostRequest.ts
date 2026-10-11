@@ -11,6 +11,7 @@ import type * as CambApi from "../../../../index.js";
  *     }
  */
 export interface GetTranscriptionResultsTranscriptionResultsPostRequest {
+    /** @deprecated Ignored by this API endpoint; retained for compatibility. */
     run_id?: number | null;
     traceparent?: string | null;
     body: CambApi.RunIDsRequestPayload;
