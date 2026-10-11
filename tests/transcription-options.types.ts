@@ -7,10 +7,10 @@ void [request, numeric, dub];
 const allCreateFields: Record<keyof Omit<CambApi.BodyCreateTranscriptionTranscribePost, "run_id">, true> = {
     language: true, media_file: true, media_url: true, file: true, audio_url: true,
     project_name: true, project_description: true, folder_id: true, transcription_mode: true,
-    run_audio_cleaning: true, include_music_in_fg: true, formatting_options: true, traceparent: true,
+    run_audio_cleaning: true, include_music_in_fg: true, formatting_options: true,
 };
 const controls: CambApi.BodyCreateTranscriptionTranscribePost = {
     language: "auto", include_music_in_fg: false, run_audio_cleaning: false,
-    formatting_options: '{"max_characters_in_segment":40}', traceparent: "trace",
+    formatting_options: '{"max_characters_in_segment":40}',
 };
 void [allCreateFields, controls];

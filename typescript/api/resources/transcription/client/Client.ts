@@ -103,7 +103,6 @@ export class TranscriptionClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ traceparent: request.traceparent ?? undefined }),
             mergeOnlyDefinedHeaders({ ..._maybeEncodedRequest.headers }),
             requestOptions?.headers,
         );
@@ -181,7 +180,6 @@ export class TranscriptionClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ traceparent: request.traceparent ?? undefined }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -267,7 +265,6 @@ export class TranscriptionClient {
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ traceparent: request.traceparent ?? undefined }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({
@@ -341,14 +338,14 @@ export class TranscriptionClient {
         request: CambApi.GetTranscriptionResultsTranscriptionResultsPostRequest,
         requestOptions?: TranscriptionClient.RequestOptions,
     ): Promise<core.WithRawResponse<Record<string, CambApi.TranscriptionResult>>> {
-        const { body: _body } = request;
+        const { traceparent, body: _body } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
 
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
-            mergeOnlyDefinedHeaders({ traceparent: request.traceparent ?? undefined }),
+            mergeOnlyDefinedHeaders({ traceparent: traceparent !== undefined ? traceparent : undefined }),
             requestOptions?.headers,
         );
         const _response = await core.fetcher({

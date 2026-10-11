@@ -32,6 +32,4 @@ export interface BodyCreateTranscriptionTranscribePost {
     /** Keep music in foreground audio during cleaning (default true). No effect when cleaning is false. */
     include_music_in_fg?: boolean;
     formatting_options?: CambApi.SubtitleFormattingOptions | string | null;
-    /** W3C trace context sent as an HTTP header. */
-    traceparent?: string | null;
 }

@@ -20,14 +20,13 @@ for (const raw of [false, true]) {
                     const {client, requests} = mock({task_id: "task"});
                     const fields = {language: "auto", media_url: "https://example.com/a.wav", audio_url: "https://example.com/old.wav",
                         project_name: "Demo", project_description: "Notes", folder_id: 7, transcription_mode: "slow"};
-                    const result = await resolve(client.createTranscription({...fields, traceparent, run_id: 99,
+                    const result = await resolve(client.createTranscription({...fields, run_id: 99,
                         include_music_in_fg: music, run_audio_cleaning: cleaning,
                         formatting_options: {max_characters_in_segment: 40}, [upload]: new Blob(["RIFFaudio"], {type: "audio/wav"})}), raw);
                     const request = requests[0];
                     const form = await request.formData();
                     assert.equal(new URL(request.url).pathname, "/apis/transcribe");
                     assert.equal(new URL(request.url).search, "");
-                    assert.equal(request.headers.get("traceparent"), traceparent);
                     for (const [key, value] of Object.entries(fields)) assert.equal(form.get(key), String(value));
                     assert.equal(form.get("include_music_in_fg"), music === undefined ? null : String(music));
                     assert.equal(form.get("run_audio_cleaning"), cleaning === undefined ? null : String(cleaning));
@@ -53,20 +52,18 @@ for (const raw of [false, true]) {
     });
     test(`status, structured/export/bulk results parity raw=${raw}`, async () => {
         let {client, requests} = mock({status: "SUCCESS", run_id: 7});
-        const status = await resolve(client.getTranscriptionTaskStatus({task_id: "task", run_id: 99, traceparent}), raw);
+        const status = await resolve(client.getTranscriptionTaskStatus({task_id: "task", run_id: 99}), raw);
         assert.equal(status.run_id, 7);
         assert.equal(new URL(requests[0].url).pathname, "/apis/transcribe/task");
         assert.equal(new URL(requests[0].url).search, "");
-        assert.equal(requests[0].headers.get("traceparent"), traceparent);
         for (const format_type of [undefined, "srt", "vtt", "txt"]) {
             for (const data_type of [undefined, "file", "raw_data"]) {
                 const body = format_type || data_type ? {transcript: data_type === "raw_data" ? "Hello" : "https://example.com/result"} : transcript;
                 ({client, requests} = mock(body));
-                assert.deepEqual(await resolve(client.getTranscriptionResult({run_id: 7, format_type, data_type, word_level_timestamps: true, traceparent}), raw), body);
+                assert.deepEqual(await resolve(client.getTranscriptionResult({run_id: 7, format_type, data_type, word_level_timestamps: true}), raw), body);
                 const url = new URL(requests[0].url);
                 assert.equal(url.pathname, "/apis/transcription-result/7");
                 assert.deepEqual(Object.fromEntries(url.searchParams), {...(format_type ? {format_type} : {}), ...(data_type ? {data_type} : {})});
-                assert.equal(requests[0].headers.get("traceparent"), traceparent);
             }
         }
         ({client, requests} = mock({"7": transcript, "8": transcript}));

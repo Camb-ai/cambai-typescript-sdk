@@ -16,6 +16,4 @@ export interface GetTranscriptionResultTranscriptionResultRunIdGetRequest {
     format_type?: CambApi.TranscriptFileFormat;
     /** Export delivery: file (default when exporting) returns a presigned URL; raw_data returns text. */
     data_type?: CambApi.TranscriptDataType;
-    /** W3C trace context sent as an HTTP header. */
-    traceparent?: string | null;
 }
