@@ -10,21 +10,26 @@ import type * as CambApi from "../../../../index.js";
  *     }
  */
 export interface BodyCreateTranscriptionTranscribePost {
+    /** @deprecated Ignored by this API endpoint; retained for compatibility. */
     run_id?: number | null;
-    /** Signed URL to audio file for transcription */
-    language: CambApi.Languages;
+    /** Language ID, locale tag, or "auto" for language detection. */
+    language: CambApi.Languages | string;
     /** Media file for transcription */
     media_file?: core.file.Uploadable | undefined;
     /** Signed URL to media file for transcription */
     media_url?: string | null;
-    /** [DEPRECATED] Use 'file' instead */
+    /** @deprecated Use media_file instead. */
     file?: core.file.Uploadable | undefined;
-    /** [DEPRECATED] Use 'audio_url' instead */
+    /** @deprecated Use media_url instead. */
     audio_url?: string | null;
     project_name?: string | null;
     project_description?: string | null;
     folder_id?: number | null;
     /** Transcription mode: `fast` (default) or `slow` for a more thorough pass. */
     transcription_mode?: "fast" | "slow" | null;
+    /** Run source separation before transcription (default true). Set false for clean speech. */
+    run_audio_cleaning?: boolean;
+    /** Keep music in foreground audio during cleaning (default true). No effect when cleaning is false. */
+    include_music_in_fg?: boolean;
     formatting_options?: CambApi.SubtitleFormattingOptions | string | null;
 }

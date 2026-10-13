@@ -8,7 +8,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "test": "npm run build && tsc --noEmit --strict --skipLibCheck --module NodeNext --moduleResolution NodeNext tests/dub-srt.types.ts && node --test tests/*.test.mjs",
+    "test": "npm run build && tsc --noEmit --strict --skipLibCheck --module NodeNext --moduleResolution NodeNext tests/*.types.ts && node --test tests/*.test.mjs",
     "prepare": "npm run build",
     "clean": "rm -rf dist",
     "rebuild": "npm run clean && npm run build"

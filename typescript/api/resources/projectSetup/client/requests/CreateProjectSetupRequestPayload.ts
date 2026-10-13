@@ -16,8 +16,8 @@ export interface CreateProjectSetupRequestPayload {
     project_description?: string | null;
     folder_id?: number | null;
     media_url: string;
-    source_language: CambApi.Languages;
-    target_languages: CambApi.Languages[];
+    source_language: CambApi.Languages | string;
+    target_languages: (CambApi.Languages | string)[];
     selected_audio_tracks?: number[] | null;
     add_output_as_an_audio_track?: boolean | null;
     chosen_dictionaries?: number[];

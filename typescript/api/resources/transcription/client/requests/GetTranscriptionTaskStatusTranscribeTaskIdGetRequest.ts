@@ -8,5 +8,6 @@
  */
 export interface GetTranscriptionTaskStatusTranscribeTaskIdGetRequest {
     task_id: string;
+    /** @deprecated Ignored by this API endpoint; retained for compatibility. */
     run_id?: number | null;
 }

@@ -9,10 +9,11 @@ import type * as CambApi from "../../../../index.js";
  *     }
  */
 export interface GetTranscriptionResultTranscriptionResultRunIdGetRequest {
-    run_id: number | null;
+    run_id: number;
+    /** @deprecated Ignored by the API; retained for compatibility. */
     word_level_timestamps?: boolean | null;
-    /** Format to use for the transcription. Either `srt`, `vtt` or `txt`. Defaults to `txt`. */
+    /** Export format: srt, vtt, or txt. Omit both export options for structured JSON. Defaults to txt when only data_type is set. */
     format_type?: CambApi.TranscriptFileFormat;
-    /** Data type for the transcription being returned. Returns the raw data of the transcription or a presigned url for the file that holds the transcription data. */
+    /** Export delivery: file (default when exporting) returns a presigned URL; raw_data returns text. */
     data_type?: CambApi.TranscriptDataType;
 }

@@ -11,7 +11,7 @@ import type * as CambApi from "../../../../index.js";
  */
 export interface GetDubbedRunTranscriptTranscriptRunIdLanguageGetRequest {
     run_id: number | null;
-    language: CambApi.Languages;
+    language: CambApi.Languages | string;
     /** Format to use for the transcription. Either `srt`, `vtt` or `txt`. Defaults to `txt`. */
     format_type?: CambApi.TranscriptFileFormat;
     /** Data type for the transcription being returned. Returns the raw data of the transcription or a presigned url for the file that holds the transcription data. */

@@ -11,7 +11,7 @@ import type * as CambApi from "../../../../index.js";
  */
 export interface GetSubtitleResultForLanguageSubResultRunIdLanguageGetRequest {
     run_id: number | null;
-    language: CambApi.Languages;
+    language: CambApi.Languages | string;
     /** Format to use for the subtitle. Either `srt`, `vtt` or `txt`. Defaults to `txt`. */
     format_type?: CambApi.TranscriptFileFormat;
     /** Data type for the subtitle being returned. Returns the raw data or a presigned url for the file. */

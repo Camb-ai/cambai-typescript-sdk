@@ -15,9 +15,9 @@ export interface EndToEndDubbingRequestPayload {
     project_description?: string | null;
     folder_id?: number | null;
     video_url: string;
-    source_language: CambApi.Languages;
-    target_language?: CambApi.Languages | null;
-    target_languages?: CambApi.Languages[] | null;
+    source_language: CambApi.Languages | string;
+    target_language?: CambApi.Languages | string | null;
+    target_languages?: (CambApi.Languages | string)[] | null;
     selected_audio_tracks?: number[] | null;
     add_output_as_an_audio_track?: boolean | null;
     chosen_dictionaries?: number[] | null;
