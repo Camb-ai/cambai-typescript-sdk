@@ -532,6 +532,31 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 Transcription accepts `run_audio_cleaning` (default true). Set it to false for clean speech to skip source separation; media preparation still runs, including when requesting subtitle formatting. Pass `language="auto"` (Python) or `language: "auto"` (TypeScript) to use the existing auto-detection language. Dubbing, subtitles, translation, translated TTS, and project-setup language inputs also accept locale strings and `"auto"`; use a concrete target language when requesting translation. Numeric language IDs remain supported.
 
+### Simple transcription example
+
+```javascript
+import { CambClient } from "@camb-ai/sdk";
+
+const client = new CambClient({ apiKey: process.env.CAMB_API_KEY });
+const job = await client.transcription.createTranscription({
+  media_url: "https://example.com/meeting.mp3",
+  language: "auto",
+  // transcription_mode: "slow" can be chosen; the default is "fast".
+  run_audio_cleaning: false,
+  include_music_in_fg: false,
+});
+console.log(job.task_id);
+```
+
+Edit the URL and options directly in [transcription.js](examples/transcription.js).
+The script submits one job, polls for completion, handles errors, and prints the result.
+With the SDK installed, run:
+
+```bash
+export CAMB_API_KEY="YOUR_API_KEY"
+node examples/transcription.js
+```
+
 ### Transcription API parity
 
 The transcription client covers all four routes: `POST /apis/transcribe`,
