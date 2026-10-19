@@ -1,7 +1,7 @@
 import { CambClient, CambApi } from '@camb-ai/sdk';
 
 const POLL_INTERVAL_MS = 5000;
-const TERMINAL_STATUSES = ['SUCCESS', 'ERROR'];
+const PENDING_STATUS = 'PENDING';
 
 const client = new CambClient({
     apiKey: process.env.CAMB_API_KEY
@@ -10,7 +10,7 @@ const client = new CambClient({
 async function waitFor(poll, taskId) {
     while (true) {
         const result = await poll({ task_id: taskId });
-        if (TERMINAL_STATUSES.includes(result.status)) {
+        if (result.status !== PENDING_STATUS) {
             return result;
         }
         await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));

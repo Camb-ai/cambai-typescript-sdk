@@ -3,6 +3,8 @@
 export const TaskStatus = {
     Success: "SUCCESS",
     Pending: "PENDING",
+    Timeout: "TIMEOUT",
     Error: "ERROR",
+    PaymentRequired: "PAYMENT_REQUIRED",
 } as const;
 export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus];
