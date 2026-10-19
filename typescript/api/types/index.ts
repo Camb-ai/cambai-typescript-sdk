@@ -43,7 +43,6 @@ export * from "./RevoicingOption.js";
 export * from "./RunIDsRequestPayload.js";
 export * from "./SegmentingOption.js";
 export * from "./SourceStream.js";
-export * from "./SpeechModels.js";
 export * from "./StoryDetails.js";
 export * from "./StreamCategory.js";
 export * from "./StreamTtsInferenceOptions.js";

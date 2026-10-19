@@ -1,2 +1,2 @@
-export type { CreateNarrationRequestPayload } from "./CreateNarrationRequestPayload.js";
+export * from "./CreateNarrationRequestPayload.js";
 export type { GetNarrationStatusNarrationTaskIdGetRequest } from "./GetNarrationStatusNarrationTaskIdGetRequest.js";

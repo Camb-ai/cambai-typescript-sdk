@@ -35,5 +35,20 @@ export interface CreateNarrationRequestPayload {
     /** Dictionaries applied to the narration. */
     chosen_dictionaries?: number[] | null;
     /** Speech model used to read the narration. */
-    speech_model?: CambApi.SpeechModels | null;
+    speech_model?: CreateNarrationRequestPayload.SpeechModel | null;
+}
+
+export namespace CreateNarrationRequestPayload {
+    export const SpeechModel = {
+        MarsPro: "mars-pro",
+        Mars81: "mars-81",
+        Mars81ProBeta: "mars-8.1-pro-beta",
+        Mars81FlashBeta: "mars-8.1-flash-beta",
+        Mars81Flash: "mars-81-flash",
+        MarsFlash: "mars-flash",
+        MarsInstruct: "mars-instruct",
+        MarsXInstruct: "mars-x-instruct",
+        MarsXBInstruct: "mars-x.b-instruct",
+    } as const;
+    export type SpeechModel = (typeof SpeechModel)[keyof typeof SpeechModel];
 }
