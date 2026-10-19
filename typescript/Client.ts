@@ -20,6 +20,12 @@ import { TranslatedStoryClient } from "./api/resources/translatedStory/client/Cl
 import { TranslatedTtsClient } from "./api/resources/translatedTts/client/Client.js";
 import { TranslationClient } from "./api/resources/translation/client/Client.js";
 import { VoiceCloningClient } from "./api/resources/voiceCloning/client/Client.js";
+import { SpotTranscriptionClient } from "./api/resources/spotTranscription/client/Client.js";
+import { SpotTranslationClient } from "./api/resources/spotTranslation/client/Client.js";
+import { SceneAudioDescriptionClient } from "./api/resources/sceneAudioDescription/client/Client.js";
+import { NarrationClient } from "./api/resources/narration/client/Client.js";
+import { ExportStemsClient } from "./api/resources/exportStems/client/Client.js";
+import { ExportAudiobookClient } from "./api/resources/exportAudiobook/client/Client.js";
 import type { BaseClientOptions, BaseRequestOptions } from "./BaseClient.js";
 import { type NormalizedClientOptionsWithAuth, normalizeClientOptionsWithAuth } from "./BaseClient.js";
 import { mergeHeaders } from "./core/headers.js";
@@ -56,6 +62,12 @@ export class CambClient {
     protected _deprecatedStreaming: DeprecatedStreamingClient | undefined;
     protected _liveTranscription: LiveTranscriptionClient | undefined;
     protected _realtime: RealtimeClient | undefined;
+    protected _spotTranscription: SpotTranscriptionClient | undefined;
+    protected _spotTranslation: SpotTranslationClient | undefined;
+    protected _sceneAudioDescription: SceneAudioDescriptionClient | undefined;
+    protected _narration: NarrationClient | undefined;
+    protected _exportStems: ExportStemsClient | undefined;
+    protected _exportAudiobook: ExportAudiobookClient | undefined;
 
     constructor(options: CambClient.Options) {
         this._options = normalizeClientOptionsWithAuth(options);
@@ -155,6 +167,30 @@ export class CambClient {
                 ) as [string, string][],
             ),
         }));
+    }
+
+    public get spotTranscription(): SpotTranscriptionClient {
+        return (this._spotTranscription ??= new SpotTranscriptionClient(this._options));
+    }
+
+    public get spotTranslation(): SpotTranslationClient {
+        return (this._spotTranslation ??= new SpotTranslationClient(this._options));
+    }
+
+    public get sceneAudioDescription(): SceneAudioDescriptionClient {
+        return (this._sceneAudioDescription ??= new SceneAudioDescriptionClient(this._options));
+    }
+
+    public get narration(): NarrationClient {
+        return (this._narration ??= new NarrationClient(this._options));
+    }
+
+    public get exportStems(): ExportStemsClient {
+        return (this._exportStems ??= new ExportStemsClient(this._options));
+    }
+
+    public get exportAudiobook(): ExportAudiobookClient {
+        return (this._exportAudiobook ??= new ExportAudiobookClient(this._options));
     }
 
     public getSwaggerDocsDocsGet(requestOptions?: CambClient.RequestOptions): core.HttpResponsePromise<unknown> {
