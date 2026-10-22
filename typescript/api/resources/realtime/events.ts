@@ -26,6 +26,10 @@ export enum ServerEventType {
     AudioDelta = "response.audio.delta",
     AudioDone = "response.audio.done",
     Error = "error",
+    /** Sent only to sessions whose source language is detected automatically. */
+    SourceLanguageChanged = "session.source_language_changed",
+    /** Sent only to `single_known_speaker` sessions; see {@link SourceLanguageSwitchConfirmationRequestedEvent}. */
+    SourceLanguageSwitchConfirmationRequested = "session.source_language_switch_confirmation_requested",
     /** Synthetic — emitted by the SDK when the transport closes, never sent by the server. */
     Closed = "Closed",
 }
@@ -80,6 +84,13 @@ export interface TranscriptDeltaEvent {
 export interface TranscriptCompletedEvent {
     readonly type: ServerEventType.TranscriptCompleted;
     transcript: string;
+    // The three fields below are sent only when the source language is detected automatically.
+    /** Identifies the utterance, e.g. for `session.ignoreUtteranceForLanguageDetection(...)`. */
+    itemId?: string;
+    /** The language the utterance was identified as; absent when it was too short or too ambiguous. */
+    language?: string;
+    /** `true` when the utterance was already in the target language, so it was passed through as text. */
+    passthrough?: boolean;
 }
 
 export interface TextDeltaEvent {
@@ -109,7 +120,37 @@ export interface AudioDoneEvent {
 export interface ErrorEvent {
     readonly type: ServerEventType.Error;
     message: string;
+    /**
+     * Stable, machine-readable error code, e.g. `"insufficient_credits"`. Branch on this, not on
+     * `message`. Absent only for errors the SDK raises itself, such as a transport error.
+     */
+    code?: string;
+    /** The error's category, e.g. `"authentication_error"` or `"server_error"`. */
+    errorType?: string;
+    /** The field at fault, e.g. `"session.target_language"`. */
+    param?: string;
     raw: unknown;
+}
+
+/**
+ * The session's source language changed: detected for the first time, detected as having
+ * switched, or set by the client.
+ */
+export interface SourceLanguageChangedEvent {
+    readonly type: ServerEventType.SourceLanguageChanged;
+    language: string;
+    previousLanguage?: string;
+}
+
+/**
+ * A `single_known_speaker` session heard sustained speech in its own target language. That is
+ * usually the other party coming through the loudspeakers rather than the local speaker switching
+ * language, so the server does not switch on its own. Confirm with
+ * `session.updateLanguages({ sourceLanguage: event.language })`, or ignore it.
+ */
+export interface SourceLanguageSwitchConfirmationRequestedEvent {
+    readonly type: ServerEventType.SourceLanguageSwitchConfirmationRequested;
+    language: string;
 }
 
 export interface ClosedEvent {
@@ -130,6 +171,8 @@ export interface ServerEventPayloads {
     [ServerEventType.AudioDelta]: AudioDeltaEvent;
     [ServerEventType.AudioDone]: AudioDoneEvent;
     [ServerEventType.Error]: ErrorEvent;
+    [ServerEventType.SourceLanguageChanged]: SourceLanguageChangedEvent;
+    [ServerEventType.SourceLanguageSwitchConfirmationRequested]: SourceLanguageSwitchConfirmationRequestedEvent;
     [ServerEventType.Closed]: ClosedEvent;
 }
 
@@ -187,6 +230,9 @@ export const PARSER_REGISTRY: {
     [ServerEventType.TranscriptCompleted]: (raw: any) => ({
         type: ServerEventType.TranscriptCompleted,
         transcript: raw?.transcript ?? "",
+        itemId: raw?.item_id ?? undefined,
+        language: raw?.language ?? undefined,
+        passthrough: raw?.passthrough ?? undefined,
     }),
     [ServerEventType.TextDelta]: (raw: any) => ({
         type: ServerEventType.TextDelta,
@@ -197,6 +243,15 @@ export const PARSER_REGISTRY: {
         text: raw?.text ?? "",
     }),
     [ServerEventType.AudioDone]: () => ({ type: ServerEventType.AudioDone }),
+    [ServerEventType.SourceLanguageChanged]: (raw: any) => ({
+        type: ServerEventType.SourceLanguageChanged,
+        language: raw?.language ?? "",
+        previousLanguage: raw?.previous_language ?? undefined,
+    }),
+    [ServerEventType.SourceLanguageSwitchConfirmationRequested]: (raw: any) => ({
+        type: ServerEventType.SourceLanguageSwitchConfirmationRequested,
+        language: raw?.language ?? "",
+    }),
     [ServerEventType.Closed]: (raw: any) => ({
         type: ServerEventType.Closed,
         code: raw?.code ?? 1000,
