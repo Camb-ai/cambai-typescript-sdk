@@ -187,6 +187,52 @@ export class RealtimeSession {
     }
 
     /**
+     * Change the session's languages mid-session; only the languages passed change.
+     *
+     * Available when the session was opened with `sourceLanguage: "auto"`:
+     * - `targetLanguage` translates into a new language from the next utterance on.
+     * - `sourceLanguage` fixes the source language, which stops automatic detection from
+     *   switching it (this is also how a switch confirmation request is confirmed). Pass `"auto"`
+     *   to go back to detecting it.
+     *
+     * The server answers with `session.updated`, and with `session.source_language_changed` when
+     * the source language changed. A change the session cannot make arrives as an `error` event
+     * with a `code`.
+     */
+    async updateLanguages(languages: {
+        sourceLanguage?: string;
+        targetLanguage?: string;
+    }): Promise<void> {
+        const sessionChanges: Record<string, string> = {};
+        if (languages.sourceLanguage !== undefined) {
+            sessionChanges.source_language = languages.sourceLanguage;
+        }
+        if (languages.targetLanguage !== undefined) {
+            sessionChanges.target_language = languages.targetLanguage;
+        }
+        if (Object.keys(sessionChanges).length === 0) {
+            throw new TypeError("pass sourceLanguage, targetLanguage, or both");
+        }
+        await this.transport.sendText(
+            JSON.stringify({ type: "session.update", session: sessionChanges }),
+        );
+    }
+
+    /**
+     * Stop counting an utterance towards a source language switch: for an utterance the
+     * application recognised as echo or crosstalk, identified by the `itemId` of its
+     * `TranscriptCompletedEvent`. It only has an effect while the switch it supports is pending.
+     */
+    async ignoreUtteranceForLanguageDetection(itemId: string): Promise<void> {
+        await this.transport.sendText(
+            JSON.stringify({
+                type: "input_audio_buffer.ignore_for_language_detection",
+                item_id: itemId,
+            }),
+        );
+    }
+
+    /**
      * Pump chunks from `source` into the session until it is exhausted.
      *
      * If `source` exposes a `stop()` method it is invoked on exit, making
@@ -255,6 +301,9 @@ export class RealtimeSession {
             const event: ErrorEvent = {
                 type: ServerEventType.Error,
                 message: errorObj.message ?? "Unknown error",
+                code: errorObj.code ?? undefined,
+                errorType: errorObj.type ?? undefined,
+                param: errorObj.param ?? undefined,
                 raw: parsed,
             };
             this.dispatch(ServerEventType.Error, event);

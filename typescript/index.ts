@@ -28,7 +28,9 @@ export {
     RealtimeMode,
     RealtimeProtocolError,
     RealtimeSession,
+    RealtimeSessionPair,
     ServerEventType as RealtimeServerEventType,
+    SpeakerSetup as RealtimeSpeakerSetup,
 } from "./api/resources/realtime/index.js";
 export { saveStreamToFile } from "./utils.js";
 export {

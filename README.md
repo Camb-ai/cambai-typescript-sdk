@@ -463,6 +463,39 @@ await mic.start();
 await session.stream(mic);
 ```
 
+#### Detecting the source language automatically
+
+In `slow` mode, pass `sourceLanguage: "auto"` and the server detects what the speaker is saying,
+reporting each change as a `SourceLanguageChanged` event. The target language may be omitted (the
+session then transcribes without translating) and changed at any time:
+
+```typescript
+const session = await client.realtime.connect({ mode: RealtimeMode.Slow, sourceLanguage: "auto" });
+
+session.on(RealtimeServerEventType.SourceLanguageChanged, (event) =>
+  console.log(`now speaking ${event.language}`),
+);
+
+await session.updateLanguages({ targetLanguage: "de-de" });
+```
+
+For a call, open both directions as a pair. Each session detects its own source language and the
+pair sets it as the other session's target, so each side hears the other in its own language:
+
+```typescript
+const pair = await client.realtime.connectSessionPair({ mode: RealtimeMode.Slow });
+await pair.waitUntilReady();
+await Promise.all([
+  pair.localSpeakerSession.stream(microphone),
+  pair.otherPartySession.stream(callAudio),
+]);
+```
+
+The local speaker's session only switches language after sustained speech, so the other party heard
+through your loudspeakers cannot switch it. When it hears its own target language for a while, it
+sends `SourceLanguageSwitchConfirmationRequested` instead of switching; confirm with
+`updateLanguages({ sourceLanguage: event.language })`, or ignore it.
+
 Runnable examples:
 [`examples/realtime-translation-microphone.js`](examples/realtime-translation-microphone.js)
 (mic in, translated speech out) and

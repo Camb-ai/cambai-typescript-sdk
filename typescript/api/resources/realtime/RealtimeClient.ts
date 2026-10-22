@@ -1,7 +1,16 @@
 import * as core from "../../../core/index.js";
 import { RealtimeConnectError } from "./errors.js";
-import { LegacyConnectOptions, resolveOptions, toQuery, toSessionPayload } from "./options.js";
+import {
+    AUTOMATIC_SOURCE_LANGUAGE,
+    ConnectOptions,
+    LegacyConnectOptions,
+    SpeakerSetup,
+    resolveOptions,
+    toQuery,
+    toSessionPayload,
+} from "./options.js";
 import { RealtimeSession } from "./RealtimeSession.js";
+import { RealtimeSessionPair } from "./RealtimeSessionPair.js";
 import { Transport, WebSocketTransport } from "./Transport.js";
 
 export interface RealtimeClientOptions {
@@ -11,6 +20,22 @@ export interface RealtimeClientOptions {
     headers?: Record<string, string>;
     /** Inject a transport (e.g. for tests). */
     transport?: () => Transport;
+}
+
+/**
+ * Options for {@link RealtimeClient.connectSessionPair}. Top-level options (e.g. `mode`,
+ * `outputModalities`) apply to both sessions; `localSpeaker` and `otherParty` override them per
+ * direction (e.g. `voiceId`, `sourceLanguageCandidates`).
+ */
+export interface SessionPairConnectOptions extends Partial<LegacyConnectOptions> {
+    localSpeaker?: Partial<ConnectOptions>;
+    otherParty?: Partial<ConnectOptions>;
+}
+
+/** A session that is configured but not yet connected, so handlers can be registered first. */
+interface UnopenedRealtimeSession {
+    session: RealtimeSession;
+    open: () => Promise<void>;
 }
 
 export const DEFAULT_REALTIME_BASE_URL = "wss://realtime.camb.ai";
@@ -43,6 +68,55 @@ export class RealtimeClient {
     // Typed as `LegacyConnectOptions` so the retired `model` option still type-checks for
     // callers who have not migrated; `resolveOptions` maps it and warns.
     async connect(opts: LegacyConnectOptions): Promise<RealtimeSession> {
+        const unopenedSession = await this.createSession(opts);
+        await unopenedSession.open();
+        return unopenedSession.session;
+    }
+
+    /**
+     * Open both directions of a call, each translating into the language the other one speaks.
+     *
+     * Both sessions detect their source language unless given one, and whenever one changes it
+     * becomes the other session's target language. The local speaker defaults to
+     * `speakerSetup: "single_known_speaker"` and the other party to `"changing_speakers"`.
+     *
+     *     const pair = await client.realtime.connectSessionPair({ mode: RealtimeMode.Slow });
+     *     await pair.waitUntilReady();
+     *     await Promise.all([
+     *         pair.localSpeakerSession.stream(microphone),
+     *         pair.otherPartySession.stream(callAudio),
+     *     ]);
+     */
+    async connectSessionPair(opts: SessionPairConnectOptions = {}): Promise<RealtimeSessionPair> {
+        const { localSpeaker, otherParty, ...sharedOptions } = opts;
+        const unopenedSessions = await Promise.all([
+            this.createSession(
+                directionOptions(sharedOptions, localSpeaker, SpeakerSetup.SingleKnownSpeaker),
+            ),
+            this.createSession(
+                directionOptions(sharedOptions, otherParty, SpeakerSetup.ChangingSpeakers),
+            ),
+        ]);
+        const sessionPair = new RealtimeSessionPair(
+            unopenedSessions[0].session,
+            unopenedSessions[1].session,
+        );
+        // Both opens settle before deciding, so a session still connecting when the other fails
+        // cannot finish connecting after the pair was closed and leak its socket.
+        const openResults = await Promise.allSettled(
+            unopenedSessions.map((unopenedSession) => unopenedSession.open()),
+        );
+        const openFailure = openResults.find(
+            (openResult): openResult is PromiseRejectedResult => openResult.status === "rejected",
+        );
+        if (openFailure !== undefined) {
+            await sessionPair.close();
+            throw openFailure.reason;
+        }
+        return sessionPair;
+    }
+
+    private async createSession(opts: LegacyConnectOptions): Promise<UnopenedRealtimeSession> {
         const apiKey =
             opts.apiKey ??
             (this.options.apiKey
@@ -81,11 +155,31 @@ export class RealtimeClient {
         // post-handshake frames are not dropped.
         const session = new RealtimeSession(transport, sessionPayload);
         await session._attach();
-        await transport.connect(url, headers);
-        // The server expects `session.update` immediately after the
-        // handshake; sending here keeps `connect` ergonomic — callers just
-        // await `session.waitUntilReady()` next.
-        await session._sendSessionUpdate();
-        return session;
+        return {
+            session,
+            open: async () => {
+                await transport.connect(url, headers);
+                // The server expects `session.update` immediately after the
+                // handshake; sending here keeps `connect` ergonomic — callers just
+                // await `session.waitUntilReady()` next.
+                await session._sendSessionUpdate();
+            },
+        };
     }
+}
+
+function directionOptions(
+    sharedOptions: Partial<LegacyConnectOptions>,
+    direction: Partial<ConnectOptions> | undefined,
+    defaultSpeakerSetup: SpeakerSetup,
+): LegacyConnectOptions {
+    const options: LegacyConnectOptions = {
+        sourceLanguage: AUTOMATIC_SOURCE_LANGUAGE,
+        ...sharedOptions,
+        ...direction,
+    };
+    if (options.sourceLanguage === AUTOMATIC_SOURCE_LANGUAGE && options.speakerSetup === undefined) {
+        options.speakerSetup = defaultSpeakerSetup;
+    }
+    return options;
 }
