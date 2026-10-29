@@ -26,5 +26,7 @@ export interface BodyCreateTranscriptionTranscribePost {
     folder_id?: number | null;
     /** Transcription mode: `fast` (default) or `slow` for a more thorough pass. */
     transcription_mode?: "fast" | "slow" | null;
+    /** Separate speakers in the transcript. Defaults to true. */
+    diarize?: boolean;
     formatting_options?: CambApi.SubtitleFormattingOptions | string | null;
 }

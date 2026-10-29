@@ -80,6 +80,7 @@ export class TranscriptionClient {
             _request.append("folder_id", request.folder_id?.toString() ?? null);
         }
 
+        _request.append("diarize", String(request.diarize ?? true));
         if (request.transcription_mode != null) {
             _request.append("transcription_mode", request.transcription_mode);
         }
