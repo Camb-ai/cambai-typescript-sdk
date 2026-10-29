@@ -560,3 +560,5 @@ Check out the `examples/` directory for complete, runnable examples:
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+Transcription creation accepts optional `diarize: boolean`, defaulting to `true`. Pass `diarize: false` for a single-speaker transcript; the client serializes the boolean in the multipart request.
