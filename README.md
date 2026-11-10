@@ -21,7 +21,7 @@ The official TypeScript SDK for interacting with Camb AI's powerful voice and au
 - **Generative Voices**: Create entirely new, unique voices from text prompts and descriptions.
 - **Soundscapes from Text**: Generate ambient audio and sound effects from textual descriptions.
 - **Transcripts & Subtitles**: Create async transcription/subtitle jobs and export TXT, SRT, or VTT results as raw data or files.
-- **Image Translation**: Translate text in images, PDFs, or ZIP uploads, then poll, download the export ZIP, inspect project data, or fine-tune a region.
+- **Image Translation**: Translate text in images, PDFs, or ZIP uploads, fine-tune a region, then download all of your translated images.
 - **Live Transcription**: Stream microphone (browser or Node) or file audio over a WebSocket and receive cumulative interim transcripts, word-level timing, and typed events.
 - **Realtime Speech-to-Speech Translation**: Stream speech over a WebSocket and receive the translation as live text and synthesized speech.
 - Access to voice cloning, translation, and more (refer to full API documentation).
@@ -377,9 +377,9 @@ See [`examples/transcription.js`](examples/transcription.js) and
 
 ### 8. Image Translation
 
-Create an image translation job with a file or URL, poll until success, then
-fetch the export ZIP. PNG, JPG, JPEG, WEBP, PDF, and ZIP inputs are accepted.
-PSD/PSB are not.
+Translate text in images, PDFs, or ZIP uploads. PNG, JPG, JPEG, WEBP, PDF, and ZIP
+are accepted; PSD/PSB are not. Fine-tune a region, then download all of your
+translated images.
 
 ```javascript
 const created = await client.imageTranslation.createImageTranslation({
@@ -389,29 +389,24 @@ const created = await client.imageTranslation.createImageTranslation({
   content_kind: "generic",
 });
 
-console.log(`Task: ${created.task_id} run_id=${created.run_id}`);
-
 while (true) {
   const status = await client.imageTranslation.getImageTranslationStatus({
     task_id: created.task_id,
   });
-  console.log(`Current Status: ${status.status}`);
   if (status.status === "SUCCESS") break;
   await new Promise((resolve) => setTimeout(resolve, 5000));
 }
 
+const project = await client.imageTranslation.getImageTranslationProject({
+  run_id: created.run_id,
+});
 const result = await client.imageTranslation.getImageTranslationResult({
   run_id: created.run_id,
 });
 console.log(result.download_url);
-
-const project = await client.imageTranslation.getImageTranslationProject({
-  run_id: created.run_id,
-});
 ```
 
-After editing a region, poll the fine-tune task, export, then fetch the ZIP
-again. If export returns `cached: true`, skip polling.
+After fine-tuning a region, export and download the updated images.
 
 ```javascript
 const ft = await client.imageTranslation.fineTuneImageTranslation({
@@ -423,9 +418,23 @@ const ft = await client.imageTranslation.fineTuneImageTranslation({
 const exported = await client.imageTranslation.exportImageTranslation({
   run_id: created.run_id,
 });
+const updated = await client.imageTranslation.getImageTranslationResult({
+  run_id: created.run_id,
+});
+console.log(updated.download_url);
 ```
 
-See [`examples/image-translation.js`](examples/image-translation.js) for a complete polling example.
+Pass `export_format: "PDF"` on create or export for a ZIP of per-language PDFs.
+Omit it, or pass `"ZIP"`, for the default ZIP of page images.
+
+```javascript
+const exported = await client.imageTranslation.exportImageTranslation({
+  run_id: created.run_id,
+  export_format: "PDF",
+});
+```
+
+See [`examples/image-translation.js`](examples/image-translation.js) for a complete example.
 
 ### 6. Live Transcription (Streaming WebSocket)
 
@@ -601,7 +610,7 @@ Check out the `examples/` directory for complete, runnable examples:
 - `dubbing.js` - Video dubbing workflow
 - `transcription.js` - Async transcription with formatting options and TXT/SRT/VTT exports
 - `subtitles.js` - Subtitle job creation, polling, and language-specific TXT/SRT/VTT exports
-- `image-translation.js` - Image translation create, poll, result, and project read
+- `image-translation.js` - Translate an image, fine-tune a region, and download the results
 - `baseten-provider.js` - Using custom hosting providers
 - `live-transcription-microphone.js` - Stream microphone audio over the WebSocket (uses `node-record-lpcm16`)
 - `live-transcription-file.js` - Stream a local WAV at real-time pace (no audio device required)

@@ -21,6 +21,8 @@ export interface BodyCreateImageTranslationImageTranslationPost {
     media_url?: string | null;
     /** `generic` (default) or `comic` */
     content_kind?: CambApi.ImageTextEditContentKind | null;
+    /** `ZIP` of page images (default) or `PDF` (a ZIP of per-language PDFs) */
+    export_format?: CambApi.ImageTextEditExportFormat | null;
     project_name?: string | null;
     project_description?: string | null;
     folder_id?: number | null;

@@ -61,6 +61,10 @@ export class ImageTranslationClient {
             _request.append("content_kind", request.content_kind);
         }
 
+        if (request.export_format != null) {
+            _request.append("export_format", request.export_format);
+        }
+
         if (request.project_name != null) {
             _request.append("project_name", request.project_name);
         }

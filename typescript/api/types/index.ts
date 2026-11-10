@@ -31,6 +31,7 @@ export * from "./FineTuneImageTranslationOut.js";
 export * from "./HttpValidationError.js";
 export * from "./ImageTextEditContentKind.js";
 export * from "./ImageTextEditCreateOut.js";
+export * from "./ImageTextEditExportFormat.js";
 export * from "./ImageTextEditExportOut.js";
 export * from "./ImageTranslationProject.js";
 export * from "./ImageTranslationResult.js";
