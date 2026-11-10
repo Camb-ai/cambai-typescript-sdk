@@ -7,6 +7,7 @@ import { LiveTranscriptionClient } from "./api/resources/liveTranscription/LiveT
 import { RealtimeClient } from "./api/resources/realtime/RealtimeClient.js";
 import { DubClient } from "./api/resources/dub/client/Client.js";
 import { FoldersClient } from "./api/resources/folders/client/Client.js";
+import { ImageTranslationClient } from "./api/resources/imageTranslation/client/Client.js";
 import { LanguagesClient } from "./api/resources/languages/client/Client.js";
 import { ProjectSetupClient } from "./api/resources/projectSetup/client/Client.js";
 import { StoryClient } from "./api/resources/story/client/Client.js";
@@ -39,6 +40,7 @@ export class CambClient {
     protected _audioSeparation: AudioSeparationClient | undefined;
     protected _dub: DubClient | undefined;
     protected _folders: FoldersClient | undefined;
+    protected _imageTranslation: ImageTranslationClient | undefined;
     protected _languages: LanguagesClient | undefined;
     protected _story: StoryClient | undefined;
     protected _translatedStory: TranslatedStoryClient | undefined;
@@ -71,6 +73,10 @@ export class CambClient {
 
     public get folders(): FoldersClient {
         return (this._folders ??= new FoldersClient(this._options));
+    }
+
+    public get imageTranslation(): ImageTranslationClient {
+        return (this._imageTranslation ??= new ImageTranslationClient(this._options));
     }
 
     public get languages(): LanguagesClient {

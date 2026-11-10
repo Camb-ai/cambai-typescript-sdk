@@ -9,6 +9,8 @@ export * as dub from "./dub/index.js";
 export * from "./dub/types/index.js";
 export * from "./folders/client/requests/index.js";
 export * as folders from "./folders/index.js";
+export * from "./imageTranslation/client/requests/index.js";
+export * as imageTranslation from "./imageTranslation/index.js";
 export * from "./languages/client/requests/index.js";
 export * as languages from "./languages/index.js";
 export * from "./projectSetup/client/requests/index.js";
