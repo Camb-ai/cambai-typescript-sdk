@@ -3,6 +3,7 @@
 import { AudioSeparationClient } from "./api/resources/audioSeparation/client/Client.js";
 import { DeprecatedStreamingClient } from "./api/resources/deprecatedStreaming/client/Client.js";
 import { DictionariesClient } from "./api/resources/dictionaries/client/Client.js";
+import { DocumentTranslationClient } from "./api/resources/documentTranslation/client/Client.js";
 import { LiveTranscriptionClient } from "./api/resources/liveTranscription/LiveTranscriptionClient.js";
 import { RealtimeClient } from "./api/resources/realtime/RealtimeClient.js";
 import { DubClient } from "./api/resources/dub/client/Client.js";
@@ -46,6 +47,7 @@ export class CambClient {
     protected _textToVoice: TextToVoiceClient | undefined;
     protected _textToSpeech: TextToSpeechClient | undefined;
     protected _subtitles: SubtitlesClient | undefined;
+    protected _documentTranslation: DocumentTranslationClient | undefined;
     protected _translation: TranslationClient | undefined;
     protected _transcription: TranscriptionClient | undefined;
     protected _translatedTts: TranslatedTtsClient | undefined;
@@ -99,6 +101,10 @@ export class CambClient {
 
     public get subtitles(): SubtitlesClient {
         return (this._subtitles ??= new SubtitlesClient(this._options));
+    }
+
+    public get documentTranslation(): DocumentTranslationClient {
+        return (this._documentTranslation ??= new DocumentTranslationClient(this._options));
     }
 
     public get translation(): TranslationClient {
