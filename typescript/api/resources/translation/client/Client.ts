@@ -403,4 +403,255 @@ export class TranslationClient {
 
         return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/translation-results");
     }
+
+    /**
+     * Translate a document (DOCX or SRT). Provide exactly one of `media_file` or `media_url`.
+     *
+     * @param {CambApi.BodyCreateDocTranslationTranslateDocPost} request
+     * @param {TranslationClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link CambApi.UnprocessableEntityError}
+     *
+     * @example
+     *     import { createReadStream } from "fs";
+     *     await client.translation.createDocTranslation({
+     *         source_language: CambApi.Languages.EN_US,
+     *         target_language: CambApi.Languages.ES_ES,
+     *         media_file: createReadStream("document.docx")
+     *     })
+     */
+    public createDocTranslation(
+        request: CambApi.BodyCreateDocTranslationTranslateDocPost,
+        requestOptions?: TranslationClient.RequestOptions,
+    ): core.HttpResponsePromise<CambApi.CreateDocTranslationOut> {
+        return core.HttpResponsePromise.fromPromise(this.__createDocTranslation(request, requestOptions));
+    }
+
+    private async __createDocTranslation(
+        request: CambApi.BodyCreateDocTranslationTranslateDocPost,
+        requestOptions?: TranslationClient.RequestOptions,
+    ): Promise<core.WithRawResponse<CambApi.CreateDocTranslationOut>> {
+        const _request = await core.newFormData();
+        _request.append("source_language", request.source_language.toString());
+        _request.append("target_language", request.target_language.toString());
+        if (request.media_file != null) {
+            await _request.appendFile("media_file", request.media_file);
+        }
+
+        if (request.media_url != null) {
+            _request.append("media_url", request.media_url);
+        }
+
+        if (request.project_name != null) {
+            _request.append("project_name", request.project_name);
+        }
+
+        if (request.project_description != null) {
+            _request.append("project_description", request.project_description);
+        }
+
+        if (request.folder_id != null) {
+            _request.append("folder_id", request.folder_id.toString());
+        }
+
+        if (request.chosen_dictionaries != null) {
+            for (const _item of request.chosen_dictionaries) {
+                _request.append("chosen_dictionaries", _item.toString());
+            }
+        }
+
+        if (request.translation_style != null) {
+            _request.append("translation_style", request.translation_style);
+        }
+
+        const _maybeEncodedRequest = await _request.getRequest();
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({ ..._maybeEncodedRequest.headers }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.CambApiEnvironment.Default,
+                "translate-doc",
+            ),
+            method: "POST",
+            headers: _headers,
+            queryParameters: requestOptions?.queryParams,
+            requestType: "file",
+            duplex: _maybeEncodedRequest.duplex,
+            body: _maybeEncodedRequest.body,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 300) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return { data: _response.body as CambApi.CreateDocTranslationOut, rawResponse: _response.rawResponse };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 422:
+                    throw new CambApi.UnprocessableEntityError(
+                        _response.error.body as CambApi.HttpValidationError,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.CambApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/translate-doc");
+    }
+
+    /**
+     * @param {CambApi.GetDocTranslationStatusTranslateDocTaskIdGetRequest} request
+     * @param {TranslationClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link CambApi.UnprocessableEntityError}
+     *
+     * @example
+     *     await client.translation.getDocTranslationTaskStatus({
+     *         task_id: "task_id"
+     *     })
+     */
+    public getDocTranslationTaskStatus(
+        request: CambApi.GetDocTranslationStatusTranslateDocTaskIdGetRequest,
+        requestOptions?: TranslationClient.RequestOptions,
+    ): core.HttpResponsePromise<CambApi.OrchestratorPipelineResult> {
+        return core.HttpResponsePromise.fromPromise(this.__getDocTranslationTaskStatus(request, requestOptions));
+    }
+
+    private async __getDocTranslationTaskStatus(
+        request: CambApi.GetDocTranslationStatusTranslateDocTaskIdGetRequest,
+        requestOptions?: TranslationClient.RequestOptions,
+    ): Promise<core.WithRawResponse<CambApi.OrchestratorPipelineResult>> {
+        const { task_id: taskId } = request;
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.CambApiEnvironment.Default,
+                `translate-doc/${core.url.encodePathParam(taskId)}`,
+            ),
+            method: "GET",
+            headers: _headers,
+            queryParameters: requestOptions?.queryParams,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 300) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return { data: _response.body as CambApi.OrchestratorPipelineResult, rawResponse: _response.rawResponse };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 422:
+                    throw new CambApi.UnprocessableEntityError(
+                        _response.error.body as CambApi.HttpValidationError,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.CambApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "GET", "/translate-doc/{task_id}");
+    }
+
+    /**
+     * @param {CambApi.GetDocTranslationResultTranslateDocResultRunIdGetRequest} request
+     * @param {TranslationClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link CambApi.UnprocessableEntityError}
+     *
+     * @example
+     *     await client.translation.getDocTranslationResult({
+     *         run_id: 1
+     *     })
+     */
+    public getDocTranslationResult(
+        request: CambApi.GetDocTranslationResultTranslateDocResultRunIdGetRequest,
+        requestOptions?: TranslationClient.RequestOptions,
+    ): core.HttpResponsePromise<CambApi.DocTranslationResult> {
+        return core.HttpResponsePromise.fromPromise(this.__getDocTranslationResult(request, requestOptions));
+    }
+
+    private async __getDocTranslationResult(
+        request: CambApi.GetDocTranslationResultTranslateDocResultRunIdGetRequest,
+        requestOptions?: TranslationClient.RequestOptions,
+    ): Promise<core.WithRawResponse<CambApi.DocTranslationResult>> {
+        const { run_id: runId } = request;
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.CambApiEnvironment.Default,
+                `translate-doc-result/${core.url.encodePathParam(runId)}`,
+            ),
+            method: "GET",
+            headers: _headers,
+            queryParameters: requestOptions?.queryParams,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 300) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return { data: _response.body as CambApi.DocTranslationResult, rawResponse: _response.rawResponse };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 422:
+                    throw new CambApi.UnprocessableEntityError(
+                        _response.error.body as CambApi.HttpValidationError,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.CambApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "GET",
+            "/translate-doc-result/{run_id}",
+        );
+    }
 }

@@ -23,6 +23,7 @@ The official TypeScript SDK for interacting with Camb AI's powerful voice and au
 - **Transcripts & Subtitles**: Create async transcription/subtitle jobs and export TXT, SRT, or VTT results as raw data or files.
 - **Live Transcription**: Stream microphone (browser or Node) or file audio over a WebSocket and receive cumulative interim transcripts, word-level timing, and typed events.
 - **Realtime Speech-to-Speech Translation**: Stream speech over a WebSocket and receive the translation as live text and synthesized speech.
+- **Document Translation**: Translate DOCX and SRT documents from a file upload or URL and download the translated file.
 - Access to voice cloning, translation, and more (refer to full API documentation).
 
 ## 📦 Installation
@@ -505,6 +506,32 @@ list and configuration, see the
 [Realtime Speech Translation tutorial](https://docs.camb.ai/tutorials/realtime-translation-with-sdk)
 and the [WebSocket API reference](https://docs.camb.ai/api-reference/websockets/realtime).
 
+### 8. Document Translation
+
+Translate a DOCX or SRT document. Pass either `media_file` (a local file) or
+`media_url`, not both. Languages accept a `Languages` value, a numeric ID, or a
+locale tag such as `"es-es"`.
+
+```javascript
+import { createReadStream } from "fs";
+
+const { task_id } = await client.translation.createDocTranslation({
+  source_language: CambApi.Languages.EN_US,
+  target_language: CambApi.Languages.ES_ES,
+  media_file: createReadStream("document.docx"), // or media_url: "https://..."
+  translation_style: "formal", // optional
+  chosen_dictionaries: [123], // optional dictionary IDs
+});
+
+const status = await client.translation.getDocTranslationTaskStatus({ task_id });
+// Poll until status.status === "SUCCESS", then:
+const { download_url } = await client.translation.getDocTranslationResult({
+  run_id: status.run_id,
+});
+```
+
+See [`examples/document-translation.js`](examples/document-translation.js) for a complete polling example.
+
 ## ⚙️ Advanced Usage & Other Features
 
 The Camb AI SDK offers a wide range of capabilities beyond these examples, including:
@@ -547,6 +574,7 @@ Check out the `examples/` directory for complete, runnable examples:
 - `dubbing.js` - Video dubbing workflow
 - `transcription.js` - Async transcription with formatting options and TXT/SRT/VTT exports
 - `subtitles.js` - Subtitle job creation, polling, and language-specific TXT/SRT/VTT exports
+- `document-translation.js` - DOCX/SRT document translation from a local file or URL
 - `baseten-provider.js` - Using custom hosting providers
 - `live-transcription-microphone.js` - Stream microphone audio over the WebSocket (uses `node-record-lpcm16`)
 - `live-transcription-file.js` - Stream a local WAV at real-time pace (no audio device required)
