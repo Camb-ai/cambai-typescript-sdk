@@ -21,7 +21,7 @@ The official TypeScript SDK for interacting with Camb AI's powerful voice and au
 - **Generative Voices**: Create entirely new, unique voices from text prompts and descriptions.
 - **Soundscapes from Text**: Generate ambient audio and sound effects from textual descriptions.
 - **Transcripts & Subtitles**: Create async transcription/subtitle jobs and export TXT, SRT, or VTT results as raw data or files.
-- **Image Translation**: Translate text in images, PDFs, or ZIP uploads, fine-tune a region, then download all of your translated images.
+- **Image Translation**: Localize images and PDFs into any language, fine-tune a region, then download all of your translated images.
 - **Live Transcription**: Stream microphone (browser or Node) or file audio over a WebSocket and receive cumulative interim transcripts, word-level timing, and typed events.
 - **Realtime Speech-to-Speech Translation**: Stream speech over a WebSocket and receive the translation as live text and synthesized speech.
 - Access to voice cloning, translation, and more (refer to full API documentation).
@@ -377,16 +377,15 @@ See [`examples/transcription.js`](examples/transcription.js) and
 
 ### 8. Image Translation
 
-Translate text in images, PDFs, or ZIP uploads. PNG, JPG, JPEG, WEBP, PDF, and ZIP
-are accepted; PSD/PSB are not. Fine-tune a region, then download all of your
-translated images.
+Localize images and PDFs into any language. Pass a publicly accessible `media_url`
+to a PNG, JPG, JPEG, WEBP, PDF, or ZIP of page images. Fine-tune a region, then
+download all of your translated images.
 
 ```javascript
 const created = await client.imageTranslation.createImageTranslation({
   source_language: CambApi.Languages.EN_US,
   target_languages: [CambApi.Languages.ES_ES, CambApi.Languages.FR_FR],
   media_url: "https://example.com/poster.png",
-  content_kind: "generic",
 });
 
 while (true) {
@@ -413,7 +412,7 @@ const ft = await client.imageTranslation.fineTuneImageTranslation({
   run_id: created.run_id,
   target_language_id: CambApi.Languages.ES_ES,
   region_id: project.pages[0].regions[0].region_id,
-  prompt: "Make the headline shorter",
+  prompt: "Use a bolder font and make the text color more vibrant",
 });
 const exported = await client.imageTranslation.exportImageTranslation({
   run_id: created.run_id,

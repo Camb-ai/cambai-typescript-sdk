@@ -29,10 +29,10 @@ export class ImageTranslationClient {
      * @throws {@link CambApi.UnprocessableEntityError}
      *
      * @example
-     *     import { createReadStream } from "fs";
      *     await client.imageTranslation.createImageTranslation({
      *         source_language: 1,
-     *         target_languages: [84]
+     *         target_languages: [84],
+     *         media_url: "https://example.com/poster.png"
      *     })
      */
     public createImageTranslation(
@@ -49,18 +49,7 @@ export class ImageTranslationClient {
         const _request = await core.newFormData();
         _request.append("source_language", request.source_language.toString());
         _request.append("target_languages", request.target_languages.map(String).join(","));
-        if (request.media_file != null) {
-            await _request.appendFile("media_file", request.media_file);
-        }
-
-        if (request.media_url != null) {
-            _request.append("media_url", request.media_url);
-        }
-
-        if (request.content_kind != null) {
-            _request.append("content_kind", request.content_kind);
-        }
-
+        _request.append("media_url", request.media_url);
         if (request.export_format != null) {
             _request.append("export_format", request.export_format);
         }

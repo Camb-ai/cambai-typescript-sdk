@@ -29,7 +29,6 @@ export * from "./GetTextToVoiceResultOut.js";
 export * from "./GetTtsResultOutFileUrl.js";
 export * from "./FineTuneImageTranslationOut.js";
 export * from "./HttpValidationError.js";
-export * from "./ImageTextEditContentKind.js";
 export * from "./ImageTextEditCreateOut.js";
 export * from "./ImageTextEditExportFormat.js";
 export * from "./ImageTextEditExportOut.js";

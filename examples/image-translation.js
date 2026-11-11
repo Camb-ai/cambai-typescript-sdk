@@ -27,7 +27,6 @@ async function main() {
     source_language: CambApi.Languages.EN_US,
     target_languages: [CambApi.Languages.ES_ES],
     media_url: "https://example.com/poster.png",
-    content_kind: "generic",
     project_name: "Poster ES",
   });
   console.log(`>> created run_id=${created.run_id}`);
@@ -46,7 +45,7 @@ async function main() {
     run_id: created.run_id,
     target_language_id: CambApi.Languages.ES_ES,
     region_id: region.region_id,
-    prompt: "Make the headline shorter",
+    prompt: "Use a bolder font and make the text color more vibrant",
   });
   await waitUntilSuccess(ft.task_id);
 
