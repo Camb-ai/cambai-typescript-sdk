@@ -515,7 +515,7 @@ locale tag such as `"es-es"`.
 ```javascript
 import { createReadStream } from "fs";
 
-const { task_id } = await client.documentTranslation.createDocTranslation({
+const { task_id } = await client.translation.createDocTranslation({
   source_language: CambApi.Languages.EN_US,
   target_language: CambApi.Languages.ES_ES,
   media_file: createReadStream("document.docx"), // or media_url: "https://..."
@@ -523,9 +523,9 @@ const { task_id } = await client.documentTranslation.createDocTranslation({
   chosen_dictionaries: [123], // optional dictionary IDs
 });
 
-const status = await client.documentTranslation.getDocTranslationTaskStatus({ task_id });
+const status = await client.translation.getDocTranslationTaskStatus({ task_id });
 // Poll until status.status === "SUCCESS", then:
-const { download_url } = await client.documentTranslation.getDocTranslationResult({
+const { download_url } = await client.translation.getDocTranslationResult({
   run_id: status.run_id,
 });
 ```

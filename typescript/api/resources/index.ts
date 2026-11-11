@@ -4,8 +4,6 @@ export * from "./deprecatedStreaming/client/requests/index.js";
 export * as deprecatedStreaming from "./deprecatedStreaming/index.js";
 export * from "./dictionaries/client/requests/index.js";
 export * as dictionaries from "./dictionaries/index.js";
-export * from "./documentTranslation/client/requests/index.js";
-export * as documentTranslation from "./documentTranslation/index.js";
 export * from "./dub/client/requests/index.js";
 export * as dub from "./dub/index.js";
 export * from "./dub/types/index.js";

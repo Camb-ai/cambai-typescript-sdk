@@ -26,7 +26,7 @@ for (const raw of [false, true]) {
         const { client, requests } = mockClient();
         const file = new Blob(["1\n00:00:01,000 --> 00:00:02,000\nHello\n"], { type: "application/x-subrip" });
         const result = await run(
-            client.documentTranslation.createDocTranslation({
+            client.translation.createDocTranslation({
                 source_language: CambApi.Languages.EN_US,
                 target_language: "es-es",
                 media_file: file,
@@ -56,7 +56,7 @@ for (const raw of [false, true]) {
     test(`${label}: create with media_url sends no file part`, async () => {
         const { client, requests } = mockClient(200, { task_id: "doc-task" });
         const result = await run(
-            client.documentTranslation.createDocTranslation({
+            client.translation.createDocTranslation({
                 source_language: 1,
                 target_language: CambApi.Languages.ES_ES,
                 media_url: "https://example.com/document.docx",
@@ -73,7 +73,7 @@ for (const raw of [false, true]) {
 
     test(`${label}: task status hits /translate-doc/{task_id}`, async () => {
         const { client, requests } = mockClient(200, { status: "SUCCESS", run_id: 42 });
-        const result = await run(client.documentTranslation.getDocTranslationTaskStatus({ task_id: "abc/123" }));
+        const result = await run(client.translation.getDocTranslationTaskStatus({ task_id: "abc/123" }));
         assert.equal(result.status, "SUCCESS");
         assert.equal(result.run_id, 42);
         assert.equal(requests[0].init.method, "GET");
@@ -82,7 +82,7 @@ for (const raw of [false, true]) {
 
     test(`${label}: result hits /translate-doc-result/{run_id}`, async () => {
         const { client, requests } = mockClient(200, { download_url: "https://example.com/out.docx" });
-        const result = await run(client.documentTranslation.getDocTranslationResult({ run_id: 42 }));
+        const result = await run(client.translation.getDocTranslationResult({ run_id: 42 }));
         assert.equal(result.download_url, "https://example.com/out.docx");
         assert.equal(requests[0].init.method, "GET");
         assert.ok(requests[0].url.endsWith("/translate-doc-result/42"));
@@ -93,7 +93,7 @@ for (const raw of [false, true]) {
         const { client } = mockClient(422, body);
         await assert.rejects(
             run(
-                client.documentTranslation.createDocTranslation({
+                client.translation.createDocTranslation({
                     source_language: 1,
                     target_language: 54,
                     media_url: "https://example.com/document.docx",

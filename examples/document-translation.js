@@ -23,7 +23,7 @@ function sleep(seconds) {
 
 async function main() {
     console.log("Creating document translation task...");
-    const createResponse = await client.documentTranslation.createDocTranslation({
+    const createResponse = await client.translation.createDocTranslation({
         source_language: CambApi.Languages.EN_US,
         target_language: CambApi.Languages.ES_ES,
         ...(documentPath ? { media_file: createReadStream(documentPath) } : { media_url: documentUrl }),
@@ -37,7 +37,7 @@ async function main() {
     let runId;
 
     while (attempts < 60) {
-        const statusResponse = await client.documentTranslation.getDocTranslationTaskStatus({
+        const statusResponse = await client.translation.getDocTranslationTaskStatus({
             task_id: taskId,
         });
 
@@ -61,7 +61,7 @@ async function main() {
         return;
     }
 
-    const result = await client.documentTranslation.getDocTranslationResult({ run_id: runId });
+    const result = await client.translation.getDocTranslationResult({ run_id: runId });
     console.log(`Translated document: ${result.download_url}`);
 }
 

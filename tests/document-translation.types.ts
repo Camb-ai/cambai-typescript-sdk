@@ -11,11 +11,11 @@ const request: CambApi.BodyCreateDocTranslationTranslateDocPost = {
 };
 
 async function check(): Promise<void> {
-    const created: CambApi.CreateDocTranslationOut = await client.documentTranslation.createDocTranslation(request);
-    const status: CambApi.OrchestratorPipelineResult = await client.documentTranslation.getDocTranslationTaskStatus({
+    const created: CambApi.CreateDocTranslationOut = await client.translation.createDocTranslation(request);
+    const status: CambApi.OrchestratorPipelineResult = await client.translation.getDocTranslationTaskStatus({
         task_id: created.task_id,
     });
-    const result: CambApi.DocTranslationResult = await client.documentTranslation.getDocTranslationResult({
+    const result: CambApi.DocTranslationResult = await client.translation.getDocTranslationResult({
         run_id: status.run_id ?? 0,
     });
     const url: string = result.download_url;
