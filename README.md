@@ -21,6 +21,7 @@ The official TypeScript SDK for interacting with Camb AI's powerful voice and au
 - **Generative Voices**: Create entirely new, unique voices from text prompts and descriptions.
 - **Soundscapes from Text**: Generate ambient audio and sound effects from textual descriptions.
 - **Transcripts & Subtitles**: Create async transcription/subtitle jobs and export TXT, SRT, or VTT results as raw data or files.
+- **Image Translation**: Localize images and PDFs into any language, with fine-tuning for individual text regions.
 - **Live Transcription**: Stream microphone (browser or Node) or file audio over a WebSocket and receive cumulative interim transcripts, word-level timing, and typed events.
 - **Realtime Speech-to-Speech Translation**: Stream speech over a WebSocket and receive the translation as live text and synthesized speech.
 - Access to voice cloning, translation, and more (refer to full API documentation).
@@ -374,6 +375,64 @@ const subtitles = await client.subtitles.getSubtitleResultForLanguage({
 See [`examples/transcription.js`](examples/transcription.js) and
 [`examples/subtitles.js`](examples/subtitles.js) for complete polling examples.
 
+### 8. Image Translation
+
+Localize images and PDFs into any language, then fine-tune individual text regions.
+
+```javascript
+const created = await client.imageTranslation.createImageTranslation({
+  source_language: CambApi.Languages.EN_US,
+  target_languages: [CambApi.Languages.ES_ES, CambApi.Languages.FR_FR],
+  media_url: "https://example.com/poster.png",
+});
+
+while (true) {
+  const status = await client.imageTranslation.getImageTranslationStatus({
+    task_id: created.task_id,
+  });
+  if (status.status === "SUCCESS") break;
+  await new Promise((resolve) => setTimeout(resolve, 5000));
+}
+
+const project = await client.imageTranslation.getImageTranslationProject({
+  run_id: created.run_id,
+});
+const result = await client.imageTranslation.getImageTranslationResult({
+  run_id: created.run_id,
+});
+console.log(result.download_url);
+```
+
+After fine-tuning a region, export and download the updated images.
+
+```javascript
+const ft = await client.imageTranslation.fineTuneImageTranslation({
+  run_id: created.run_id,
+  target_language_id: CambApi.Languages.ES_ES,
+  region_id: project.pages[0].regions[0].region_id,
+  prompt: "Use a bolder font and make the text color more vibrant",
+});
+const exported = await client.imageTranslation.exportImageTranslation({
+  run_id: created.run_id,
+});
+const updated = await client.imageTranslation.getImageTranslationResult({
+  run_id: created.run_id,
+});
+console.log(updated.download_url);
+```
+
+Pass `export_format: "PDF"` on create or export for a ZIP of per-language PDFs.
+Omit it, or pass `"ZIP"`, for the default ZIP of page images.
+
+```javascript
+const exported = await client.imageTranslation.exportImageTranslation({
+  run_id: created.run_id,
+  export_format: "PDF",
+});
+```
+
+See [`examples/image-translation.js`](examples/image-translation.js) for a complete example.
+
 ### 6. Live Transcription (Streaming WebSocket)
 
 Stream audio over a single WebSocket and receive cumulative interim
@@ -513,6 +572,7 @@ The Camb AI SDK offers a wide range of capabilities beyond these examples, inclu
 - Translated TTS
 - Audio Dubbing
 - Transcription (async file/URL jobs)
+- Image Translation (async file/URL jobs)
 - Live Transcription (streaming WebSocket — see Example 6 above)
 - Realtime Speech-to-Speech Translation (streaming WebSocket — see Example 7 above)
 - And more!
@@ -547,6 +607,7 @@ Check out the `examples/` directory for complete, runnable examples:
 - `dubbing.js` - Video dubbing workflow
 - `transcription.js` - Async transcription with formatting options and TXT/SRT/VTT exports
 - `subtitles.js` - Subtitle job creation, polling, and language-specific TXT/SRT/VTT exports
+- `image-translation.js` - Translate an image, fine-tune a region, and download the results
 - `baseten-provider.js` - Using custom hosting providers
 - `live-transcription-microphone.js` - Stream microphone audio over the WebSocket (uses `node-record-lpcm16`)
 - `live-transcription-file.js` - Stream a local WAV at real-time pace (no audio device required)
