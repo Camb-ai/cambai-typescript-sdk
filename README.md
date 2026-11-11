@@ -574,6 +574,7 @@ Check out the `examples/` directory for complete, runnable examples:
 - `dubbing.js` - Video dubbing workflow
 - `transcription.js` - Async transcription with formatting options and TXT/SRT/VTT exports
 - `subtitles.js` - Subtitle job creation, polling, and language-specific TXT/SRT/VTT exports
+- `document-translation.js` - DOCX/SRT document translation from a local file or URL
 - `baseten-provider.js` - Using custom hosting providers
 - `live-transcription-microphone.js` - Stream microphone audio over the WebSocket (uses `node-record-lpcm16`)
 - `live-transcription-file.js` - Stream a local WAV at real-time pace (no audio device required)
